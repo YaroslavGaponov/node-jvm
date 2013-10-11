@@ -1,0 +1,4 @@
+http://www.uni-vologda.ac.ru/java/jvm/index.html
+http://habrahabr.ru/post/178315/
+http://docs.oracle.com/javase/specs/jvms/se5.0/html/ClassFile.doc.html
+http://homepages.inf.ed.ac.uk/kwxm/JVM/codeByNo.html
