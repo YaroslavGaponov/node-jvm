@@ -289,7 +289,7 @@ var getClassImage = function(classBytes) {
 };
 
 
-var start = function(classImage, entryPointName) {
+var run = function(classImage, entryPointName) {
     
     var entryPointName = entryPointName || "main";
     var entryPointMethod = null;
@@ -307,7 +307,7 @@ var start = function(classImage, entryPointName) {
         throw new Error("Entry point method is not found.");
     }
     
-    var VM =  {        
+    var state =  {        
         ip: 0,
         stack: [],
         locals: [0,0,0,0],
@@ -324,62 +324,62 @@ var start = function(classImage, entryPointName) {
     };
     
     while(true) {
-        var cmd = VM.getByte();
+        var cmd = state.getByte();
         switch(cmd) {
             case Opcodes.getstatic:
-                var _static_field = classImage.constant_pool[VM.getWord()];                
+                var _static_field = classImage.constant_pool[state.getWord()];                
                 var _class = classImage.constant_pool[classImage.constant_pool[_static_field.class_index].name_index].bytes;
                 var _name_and_type = classImage.constant_pool[classImage.constant_pool[_static_field.name_and_type_index].name_index].bytes;                
-                VM.stack.push(require(util.format("%s/%s/%s", __dirname, _class, _name_and_type)));
+                state.stack.push(require(util.format("%s/%s/%s", __dirname, _class, _name_and_type)));
                 break;
             case Opcodes.ldc:
-                var _const = classImage.constant_pool[VM.getByte()];
+                var _const = classImage.constant_pool[state.getByte()];
                 switch(_const.tag) {
                     case TAGS.CONSTANT_String:
-                        VM.stack.push(classImage.constant_pool[_const.string_index].bytes);
+                        state.stack.push(classImage.constant_pool[_const.string_index].bytes);
                         break;
                 }
                 break;
             case Opcodes.invokevirtual:
-                var _method = classImage.constant_pool[VM.getWord()];
+                var _method = classImage.constant_pool[state.getWord()];
                 var methodName = classImage.constant_pool[classImage.constant_pool[_method.name_and_type_index].name_index].bytes
-                var data = VM.stack.pop();
-                var _module = VM.stack.pop();
+                var data = state.stack.pop();
+                var _module = state.stack.pop();
                 _module[methodName](data);
                 break;
             case Opcodes.iconst_0:
-                VM.stack.push(0);
+                state.stack.push(0);
                 break;
             case Opcodes.istore_1:
-                VM.locals[1] = VM.stack.pop();
+                state.locals[1] = state.stack.pop();
                 break;
             case Opcodes.goto:                
-                VM.ip += Helper.getSInt(VM.getWord()) - 1;
+                state.ip += Helper.getSInt(state.getWord()) - 1;
                 break;
             case Opcodes.iload_1:
-                VM.stack.push(VM.locals[1]);
+                state.stack.push(state.locals[1]);
                 break;
             case Opcodes.lconst_1:
-                VM.stack.push(VM.locals[1]);
+                state.stack.push(state.locals[1]);
                 break;
             case Opcodes.bipush:
-                VM.stack.push(VM.getByte());
+                state.stack.push(state.getByte());
                 break;
             case Opcodes.if_icmplt:
-                var jmp = VM.ip - 1 + Helper.getSInt(VM.getWord());                                
-                if (VM.stack.pop() > VM.stack.pop()) {
-                    VM.ip = jmp;
+                var jmp = state.ip - 1 + Helper.getSInt(state.getWord());                                
+                if (state.stack.pop() > state.stack.pop()) {
+                    state.ip = jmp;
                 }
                 break;
             case Opcodes.iinc:
-                var name = VM.getByte();
-                var step = VM.getByte();
-                VM.locals[name] += step;
+                var name = state.getByte();
+                var step = state.getByte();
+                state.locals[name] += step;
                 break;
             case Opcodes.return:
                 process.exit();
             default:
-                throw new Error(util.format("Command '%s' [0x%s] is not supported. ip = %s", Opcodes.toString(cmd), cmd.toString(16), VM.ip));
+                throw new Error(util.format("Command '%s' [0x%s] is not supported. ip = %s", Opcodes.toString(cmd), cmd.toString(16), state.ip));
         }
     }
     
@@ -392,8 +392,8 @@ if (process.argv.length < 3) {
     fs.readFile(process.argv[2], function(error, bytes) {
         if (!error) {
             var clasImage = getClassImage(bytes);
-            fs.writeFileSync(process.argv[2] + ".json", JSON.stringify(clasImage));
-            start(clasImage);            
+            //fs.writeFileSync(process.argv[2] + ".json", JSON.stringify(clasImage));
+            run(clasImage);            
         }
     });
 }
