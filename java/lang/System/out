@@ -1,0 +1,11 @@
+var util = require("util");
+
+module.exports = {
+    "print": function() {
+        util.print.apply(null, arguments);
+    },    
+    "println": function() {
+        util.print.apply(null, arguments);
+        util.print("\n");
+    }
+}

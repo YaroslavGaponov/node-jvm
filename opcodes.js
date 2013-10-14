@@ -10,7 +10,7 @@ var opcodes = module.exports = {
     "iconst_4": 0x07,
     "iconst_5": 0x08,
     "lconst_0": 0x09,
-    "lconst_1": 0x10,
+    "lconst_1": 0x0A,
     "fconst_0": 0x0B,
     "fconst_1": 0x0C,
     "fconst_2": 0x0D,

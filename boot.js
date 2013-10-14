@@ -5,10 +5,6 @@ var StreamReader = require("./reader.js");
 var Opcodes = require("./opcodes.js");
 
 
-var getClassImage = function(classBytes) {
-
-    var classImage = {};
-    
     var TAGS = {
         CONSTANT_Class: 7,
         CONSTANT_Fieldref: 9,
@@ -29,8 +25,7 @@ var getClassImage = function(classBytes) {
                 }
             }
             return null;
-        }
-        
+        }        
     };
     
     var ACCESS_FLAGS = {
@@ -67,7 +62,12 @@ var getClassImage = function(classBytes) {
         LocalVariableTable: "LocalVariableTable",
         Deprecated: "Deprecated"
     };
-    
+
+
+var getClassImage = function(classBytes) {
+
+    var classImage = {};
+        
     var getAttribues = function(attribute_name_index, bytes) {
             
         var sr = new StreamReader.create(bytes);
@@ -285,11 +285,115 @@ var getClassImage = function(classBytes) {
     
     return classImage;
  
-}
+};
 
 
-fs.readFile(process.argv[2], function(error, bytes) {
-    if (!error) {
-        fs.writeFileSync(process.argv[2] + ".json", JSON.stringify(getClassImage(bytes)));
+var start = function(classImage, entryPointName) {
+    
+    var entryPointName = entryPointName || "main";
+    var entryPointMethod = null;
+    
+    for(var i=0; i<classImage.methods.length; i++) {        
+        var method = classImage.methods[i];
+        if (((method.access_flags & ACCESS_FLAGS.ACC_PUBLIC) !== 0) && ((method.access_flags & ACCESS_FLAGS.ACC_STATIC) !== 0)) {            
+            if (classImage.constant_pool[method.name_index].bytes === entryPointName) {
+                entryPointMethod = method;
+                break;
+            }
+        }
     }
-});
+    if (!entryPointMethod) {
+        throw new Error("Entry point method is not found.");
+    }
+    
+    var VM =  {        
+        ip: 0,
+        stack: [],
+        locals: [0,0,0,0],
+        code: entryPointMethod.attributes[0].info.code,
+        getByte: function() {
+            return this.code[this.ip++];
+        },
+        getWord: function() {
+            return this.getByte()<<8 | this.getByte();
+        },
+        getDWord: function() {
+            return this.getWord()<<16 | this.getWord()();
+        }        
+    };
+    
+    while(true) {
+        var cmd = VM.getByte();
+        switch(cmd) {
+            case Opcodes.getstatic:
+                var _static_field = classImage.constant_pool[VM.getWord()];                
+                var _class = classImage.constant_pool[classImage.constant_pool[_static_field.class_index].name_index].bytes;
+                var _name_and_type = classImage.constant_pool[classImage.constant_pool[_static_field.name_and_type_index].name_index].bytes;                
+                VM.stack.push(require(util.format("%s/%s/%s", __dirname, _class, _name_and_type)));
+                break;
+            case Opcodes.ldc:
+                var _const = classImage.constant_pool[VM.getByte()];
+                switch(_const.tag) {
+                    case TAGS.CONSTANT_String:
+                        VM.stack.push(classImage.constant_pool[_const.string_index].bytes);
+                        break;
+                }
+                break;
+            case Opcodes.invokevirtual:
+                var _method = classImage.constant_pool[VM.getWord()];
+                var methodName = classImage.constant_pool[classImage.constant_pool[_method.name_and_type_index].name_index].bytes
+                var data = VM.stack.pop();
+                var _module = VM.stack.pop();
+                _module[methodName](data);
+                break;
+            case Opcodes.iconst_0:
+                VM.stack.push(0);
+                break;
+            case Opcodes.istore_1:
+                VM.locals[1] = VM.stack.pop();
+                break;
+            case Opcodes.goto:                
+                VM.ip += VM.getWord() - 1;
+                break;
+            case Opcodes.iload_1:
+                VM.stack.push(VM.locals[1]);
+                break;
+            case Opcodes.lconst_1:
+                VM.stack.push(VM.locals[1]);
+                break;
+            case Opcodes.bipush:
+                VM.stack.push(VM.getByte());
+                break;
+            case Opcodes.if_icmplt:
+                var jmp = 65536 - VM.getWord();
+
+                if (VM.stack.pop() > VM.stack.pop()) {
+                    VM.ip = jmp;
+                }
+                break;
+            case Opcodes.iinc:
+                var name = VM.getByte();
+                var step = VM.getByte();
+                VM.locals[name] += step;
+                break;
+            case Opcodes.return:
+                process.exit();
+            default:
+                throw new Error(util.format("Command '%s' [0x%s] is not supported. ip = %s", Opcodes.toString(cmd), cmd.toString(16), VM.ip));
+        }
+    }
+    
+    
+};
+
+if (process.argv.length < 3) {
+    util.print("help: node boot.js [classfile]");    
+} else {
+    fs.readFile(process.argv[2], function(error, bytes) {
+        if (!error) {
+            var clasImage = getClassImage(bytes);
+            fs.writeFileSync(process.argv[2] + ".json", JSON.stringify(clasImage));
+            start(clasImage);            
+        }
+    });
+}
