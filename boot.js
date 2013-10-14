@@ -3,6 +3,7 @@ var util = require("util");
 var fs = require("fs");
 var StreamReader = require("./reader.js");
 var Opcodes = require("./opcodes.js");
+var Helper = require("./helper.js");
 
 
     var TAGS = {
@@ -353,7 +354,7 @@ var start = function(classImage, entryPointName) {
                 VM.locals[1] = VM.stack.pop();
                 break;
             case Opcodes.goto:                
-                VM.ip += VM.getWord() - 1;
+                VM.ip += Helper.getSInt(VM.getWord()) - 1;
                 break;
             case Opcodes.iload_1:
                 VM.stack.push(VM.locals[1]);
@@ -365,8 +366,7 @@ var start = function(classImage, entryPointName) {
                 VM.stack.push(VM.getByte());
                 break;
             case Opcodes.if_icmplt:
-                var jmp = 65536 - VM.getWord();
-
+                var jmp = VM.ip - 1 + Helper.getSInt(VM.getWord());                                
                 if (VM.stack.pop() > VM.stack.pop()) {
                     VM.ip = jmp;
                 }
