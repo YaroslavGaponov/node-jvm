@@ -326,11 +326,13 @@ var run = function(classImage, entryPointName) {
     while(true) {
         var cmd = state.getByte();
         switch(cmd) {
+            case Opcodes.nop:
+                break;
             case Opcodes.getstatic:
-                var _static_field = classImage.constant_pool[state.getWord()];                
-                var _class = classImage.constant_pool[classImage.constant_pool[_static_field.class_index].name_index].bytes;
-                var _name_and_type = classImage.constant_pool[classImage.constant_pool[_static_field.name_and_type_index].name_index].bytes;                
-                state.stack.push(require(util.format("%s/%s/%s", __dirname, _class, _name_and_type)));
+                var static_field = classImage.constant_pool[state.getWord()];                
+                var className = classImage.constant_pool[classImage.constant_pool[static_field.class_index].name_index].bytes;
+                var name_and_type = classImage.constant_pool[classImage.constant_pool[static_field.name_and_type_index].name_index].bytes;                
+                state.stack.push(require(util.format("%s/%s/%s", __dirname, className, name_and_type)));
                 break;
             case Opcodes.ldc:
                 var _const = classImage.constant_pool[state.getByte()];
@@ -341,11 +343,10 @@ var run = function(classImage, entryPointName) {
                 }
                 break;
             case Opcodes.invokevirtual:
-                var _method = classImage.constant_pool[state.getWord()];
-                var methodName = classImage.constant_pool[classImage.constant_pool[_method.name_and_type_index].name_index].bytes
-                var data = state.stack.pop();
-                var _module = state.stack.pop();
-                _module[methodName](data);
+                var methodName = classImage.constant_pool[classImage.constant_pool[classImage.constant_pool[state.getWord()].name_and_type_index].name_index].bytes
+                var args = state.stack.pop();
+                var handler = state.stack.pop();
+                handler[methodName](args);
                 break;
             case Opcodes.iconst_0:
                 state.stack.push(0);
