@@ -1,0 +1,29 @@
+{
+  "name": "node-jvm",
+  "version": "0.0.1",
+  "description": "jvm",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YaroslavGaponov/node-jvm.git"
+  },
+  "keywords": [
+    "jvm",
+    "java",
+    "virtual",
+    "machine"
+  ],
+  "author": "Yaroslav Gaponov",
+  "license": "BSD",
+  "readmeFilename": "readme.md",
+  "gitHead": "83c5cb707556be23a180c7bd62c6f20ad65b979a",
+  "bugs": {
+    "url": "https://github.com/YaroslavGaponov/node-jvm/issues"
+  }
+}
