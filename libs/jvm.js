@@ -62,24 +62,45 @@ JVM.prototype.run = function() {
             case Opcodes.nop:
                 break;            
             case Opcodes.getstatic:
-                var static_field = frame.getConstant(frame.read16());                
-                var className = frame.getConstant(frame.getConstant(static_field.class_index).name_index).bytes;
-                var name_and_type = frame.getConstant(frame.getConstant(static_field.name_and_type_index).name_index).bytes;                
-                frame.STACK.push(require(util.format("%s/%s/%s", __dirname, className, name_and_type)));
+                var staticField = frame.getConstant(frame.read16());                
+                var packageName = frame.getConstant(frame.getConstant(staticField.class_index).name_index).bytes;
+                var className = frame.getConstant(frame.getConstant(staticField.name_and_type_index).name_index).bytes;                
+                frame.STACK.push(require(util.format("%s/%s/%s", __dirname, packageName, className)));
                 break;
             case Opcodes.ldc:
                 var constant = frame.getConstant(frame.read8());
                 switch(constant.tag) {
-                    case TAGS.CONSTANT_String:
+                    case TAGS.CONSTANT_String:                        
                         frame.STACK.push(frame.getConstant(constant.string_index).bytes);
                         break;
+                    default:
+                        throw new Error("not support constant type");
                 }
                 break;
-            case Opcodes.invokevirtual:
-                var methodName = frame.getConstant(frame.getConstant(frame.getConstant(frame.read16()).name_and_type_index).name_index).bytes;
-                var args = frame.STACK.pop();
-                var handler = frame.STACK.pop();
-                handler[methodName](args);
+
+            case Opcodes.invokevirtual:                
+                var methodRefIndex = frame.read16();
+                var methodName = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).name_index).bytes;
+                var paramType = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).signature_index).bytes;
+                var args = [];
+                switch (paramType) {
+                    case "()V":
+                        break;
+                    case "(I)V":
+                        args.push(frame.STACK.pop());
+                        break;
+                    case "(Ljava/lang/String;)V":
+                        args.push(frame.STACK.pop());
+                        break;
+                    case "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;":
+                        args = frame.STACK.pop();
+                        args.unshift(frame.STACK.pop());
+                        break;
+                    default:
+                        throw new Error("Not support type " + paramType);
+                    
+                }
+                frame.STACK.pop()[methodName].apply(null, args);                
                 break;
             
             case Opcodes.iconst_0:
@@ -167,7 +188,25 @@ JVM.prototype.run = function() {
             case Opcodes.iinc:
                 frame.LOCALS[frame.read8()] += frame.read8();
                 break;
-                        
+            case Opcodes.anewarray:
+                var type = frame.read16();
+                var size = frame.STACK.pop();
+                frame.STACK.push(new Array(size));                
+                break;
+            case Opcodes.dup:
+                var ref = frame.STACK.pop();
+                frame.STACK.push(ref);
+                frame.STACK.push(ref);
+                break;
+            case Opcodes.pop:
+                frame.STACK.pop();
+                break;
+            case Opcodes.aastore:
+                var val = frame.STACK.pop();
+                var indx = frame.STACK.pop();                
+                var ref = frame.STACK.pop();                
+                ref[indx] = val;
+                break;
             case Opcodes.goto:                
                 frame.IP += Helper.getSInt(frame.read16()) - 1;
                 break;            

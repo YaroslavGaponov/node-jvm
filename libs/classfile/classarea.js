@@ -131,7 +131,7 @@ var getClassImage = function(classBytes) {
             case TAGS.CONSTANT_Utf8:
                 var length = reader.read16();
                 var bytes = reader.readString(length);
-                classImage.constant_pool.push( { tag: tag, length: length, bytes: bytes } );
+                classImage.constant_pool.push( { tag: tag, bytes: bytes } );
                 break;
             case TAGS.CONSTANT_Methodref:
                 var class_index = reader.read16();

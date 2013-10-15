@@ -7,5 +7,8 @@ module.exports = {
     "println": function() {
         util.print.apply(null, arguments);
         util.print("\n");
+    },
+    "format": function() {
+        util.print(util.format.apply(null, arguments));
     }
 }
