@@ -2,10 +2,9 @@
 public class Application {
 
 	public static void main(String[] args) {
-		System.out.println("This is test: " + "Hello world!!!" + 10);
-		for(int i=0; i<10; i++) {
-			System.out.print(i);
-		}		
-		System.out.println("bye");
+		int N = 10;
+		System.out.println("Print from 1 to 10");
+        for (int i = 1; i <= N; i++)
+            System.out.println(i);
 	}
 }

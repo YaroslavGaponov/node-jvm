@@ -1,6 +1,6 @@
 
-var StreamReader = function(bytes, offset) {
-    if (this instanceof StreamReader) {
+var Reader = function(bytes, offset) {
+    if (this instanceof Reader) {
         this.bytes = bytes;
         this.offset = offset || 0;
     } else {
@@ -8,31 +8,31 @@ var StreamReader = function(bytes, offset) {
     }
 }
 
-StreamReader.prototype.readByte = function() {
+Reader.prototype.read8 = function() {
     var data = this.bytes.readUInt8(this.offset);
     this.offset += 1;
     return data;
 }
 
-StreamReader.prototype.readWord = function() {
+Reader.prototype.read16 = function() {
     var data = this.bytes.readUInt16BE(this.offset);
     this.offset += 2;
     return data;
 }
 
-StreamReader.prototype.readDWord = function() {
+Reader.prototype.read32 = function() {
     var data = this.bytes.readUInt32BE(this.offset);
     this.offset += 4;
     return data;
 }
 
-StreamReader.prototype.readString = function(length) {
+Reader.prototype.readString = function(length) {
     var data = this.bytes.toString(null, this.offset, this.offset + length)
     this.offset += length;
     return data;
 }
 
-StreamReader.prototype.readBytes = function(length) {
+Reader.prototype.readBytes = function(length) {
     var data = this.bytes.slice(this.offset, this.offset + length);
     this.offset += length;
     return data;
@@ -40,5 +40,5 @@ StreamReader.prototype.readBytes = function(length) {
 
 
 module.exports.create = function(bytes, offset) {
-    return new StreamReader(bytes, offset);    
+    return new Reader(bytes, offset);    
 }
