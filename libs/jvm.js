@@ -93,8 +93,9 @@ JVM.prototype.run = function() {
                         args.push(frame.STACK.pop());
                         break;
                     case "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;":
-                        args = frame.STACK.pop();
-                        args.unshift(frame.STACK.pop());
+                        args.push(frame.STACK.pop());
+                        args.push(frame.STACK.pop());
+                        args = args.reverse();
                         break;
                     default:
                         throw new Error("Not support type " + paramType);
