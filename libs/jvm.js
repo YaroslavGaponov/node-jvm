@@ -55,12 +55,16 @@ JVM.prototype.run = function() {
     }
     
     var frame = this.frames.pop();
+    
+    for(var i=0; i<arguments.length; i++) {
+        frame.LOCALS[i] = arguments[i];
+    }
         
     while(true) {
         var cmd = frame.read8();
         switch(cmd) {
             case Opcodes.nop:
-                break;            
+                break;
             case Opcodes.getstatic:
                 var staticField = frame.getConstant(frame.read16());                
                 var packageName = frame.getConstant(frame.getConstant(staticField.class_index).name_index).bytes;
@@ -77,13 +81,33 @@ JVM.prototype.run = function() {
                         throw new Error("not support constant type");
                 }
                 break;
-
+            case Opcodes.invokestatic:
+                var staticMethod = frame.getConstant(frame.read16());
+                var packageClassName = frame.getConstant(frame.getConstant(staticMethod.class_index).name_index).bytes;
+                var method = frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).name_index).bytes;                
+                var argsType = frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).signature_index).bytes;
+                args = [];
+                switch(argsType) {                    
+                    case "(Ljava/lang/String;)I":                        
+                        args.push(frame.STACK.pop());
+                        break;
+                    case "(I)V":
+                        args.push(frame.STACK.pop());
+                        break;
+                    case "(I)Ljava/lang/Integer;":
+                        args.push(frame.STACK.pop());
+                        break;
+                    default:
+                        throw new Error("Not support type " + argsType);
+                }
+                frame.STACK.push(require(util.format("%s/%s/%s", __dirname, packageClassName, method)).apply(null, args));
+                break;
             case Opcodes.invokevirtual:                
                 var methodRefIndex = frame.read16();
                 var methodName = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).name_index).bytes;
-                var paramType = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).signature_index).bytes;
+                var argsType = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).signature_index).bytes;
                 var args = [];
-                switch (paramType) {
+                switch (argsType) {
                     case "()V":
                         break;
                     case "(I)V":
@@ -96,12 +120,11 @@ JVM.prototype.run = function() {
                         args = args.reverse();
                         break;
                     default:
-                        throw new Error("Not support type " + paramType);
+                        throw new Error("Not support type " + argsType);
                     
                 }
                 frame.STACK.pop()[methodName].apply(null, args);                
-                break;
-            
+                break;            
             case Opcodes.iconst_0:
                 frame.STACK.push(0);
                 break;
@@ -136,7 +159,18 @@ JVM.prototype.run = function() {
             case Opcodes.istore_3:
                 frame.LOCALS[3] = frame.STACK.pop();
                 break;
-            
+            case Opcodes.aload_0:
+                frame.STACK.push(frame.LOCALS[0]);
+                break;
+            case Opcodes.aload_1:
+                frame.STACK.push(frame.LOCALS[1]);
+                break;
+            case Opcodes.aload_2:
+                frame.STACK.push(frame.LOCALS[2]);
+                break;
+            case Opcodes.aload_3:
+                frame.STACK.push(frame.LOCALS[3]);
+                break;            
             case Opcodes.iload:
                 frame.STACK.push(frame.LOCALS[frame.read8()]);
                 break;                        
@@ -205,6 +239,23 @@ JVM.prototype.run = function() {
                 var indx = frame.STACK.pop();                
                 var ref = frame.STACK.pop();                
                 ref[indx] = val;
+                break;
+            case Opcodes.arraylength:
+                var ref = frame.STACK.pop();
+                frame.STACK.push(ref.length);
+                break;
+            case Opcodes.if_icmpeq:
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
+                var ref1 = frame.STACK.pop();
+                var ref2 = frame.STACK.pop();
+                if (ref1 === ref2) {
+                    frame.IP = jmp;
+                }
+                break;
+            case Opcodes.aaload:
+                var indx = frame.STACK.pop();
+                var ref = frame.STACK.pop();                
+                frame.STACK.push(ref[indx]);
                 break;
             case Opcodes.goto:                
                 frame.IP += Helper.getSInt(frame.read16()) - 1;
