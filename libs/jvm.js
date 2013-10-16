@@ -87,8 +87,6 @@ JVM.prototype.run = function() {
                     case "()V":
                         break;
                     case "(I)V":
-                        args.push(frame.STACK.pop());
-                        break;
                     case "(Ljava/lang/String;)V":
                         args.push(frame.STACK.pop());
                         break;

@@ -1,11 +1,18 @@
 
+var ATTRIBUTE_TYPES = require("./classfile/attributetypes.js");
 
 var Frame = module.exports = function(classArea, method) {
     if (this instanceof Frame) {
         
         this._classArea = classArea;
         this._method = method;
-        this._code = method.attributes[0].info.code;
+        
+        for(var i=0; i<method.attributes.length; i++) {
+            if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
+                this._code = method.attributes[i].info.code;
+                break;
+            }
+        }
         
         this.IP = 0;
         this.LOCALS = new Array(4);
