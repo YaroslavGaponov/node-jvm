@@ -6,8 +6,10 @@ public class Application {
 		Object o = new Object();		
 		System.out.println(o.toString());
 		
-		StringBuilder sb = new StringBuilder();
-		sb.append("test");
+		StringBuilder sb = new StringBuilder("hello");
+		sb.append(" test 1");
+		sb.append(" test 2");
+		sb.append(" test 3");
 		System.out.println(sb.toString());
 		
 		System.out.println(sb.equals(sb));

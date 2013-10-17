@@ -28,3 +28,11 @@ Object.prototype["hashCode"] = function() {
 Object.prototype["equals"] = function() {
     return this === arguments[0];
 }
+
+Object.prototype["clone"] = function() {
+    var o = {};
+    for(var name in this) {
+        o[name] = this[name];
+    }
+    return o;
+}
