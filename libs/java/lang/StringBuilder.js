@@ -1,16 +1,25 @@
+var util = require("util");
+var Object = require("./Object.js");
 
-var StringBuilder = module.exports = function(str) {
+var StringBuilder = module.exports = function(p) {
     if (this instanceof StringBuilder) {
-        this._buf = str || "";
+        if (typeof p === "number") {
+            this._buf = new Array(p).join(' ');
+        } else {
+            this._buf = p || "";
+        }
     } else {
-        return new StringBuilder(str);
+        return new StringBuilder(p);
     }
 }
+
+util.inherits(StringBuilder, Object);
 
 StringBuilder.prototype["<init>"] = function() {
     for(var i=0; i<arguments.length; i++) {
         this._buf += arguments[i].toString();
     }
+    return this;
 }
 
 StringBuilder.prototype["append"] = function() {

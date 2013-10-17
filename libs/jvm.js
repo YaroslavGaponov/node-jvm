@@ -299,6 +299,22 @@ JVM.prototype.run = function() {
                 frame.STACK.push(ref[indx]);
                 break;
             
+            case Opcodes.astore_0:
+                frame.LOCALS[0] = frame.STACK.pop();
+                break;
+            
+            case Opcodes.astore_1:
+                frame.LOCALS[1] = frame.STACK.pop();
+                break;
+
+            case Opcodes.astore_2:
+                frame.LOCALS[2] = frame.STACK.pop();
+                break;
+
+            case Opcodes.astore_3:
+                frame.LOCALS[3] = frame.STACK.pop();
+                break;
+            
             case Opcodes.goto:                
                 frame.IP += Helper.getSInt(frame.read16()) - 1;
                 break;
