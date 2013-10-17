@@ -27,7 +27,7 @@ var JVM = module.exports = function(entryPoint) {
 JVM.prototype.loadClassFile = function(classFileName) {
     var bytes = fs.readFileSync(classFileName);
     var classArea = new ClassArea(bytes);
-    this.classes[classFileName] = classArea;
+    this.classes[classArea.getClassName()] = classArea;
         
     if (!this.entryPoint.className || (this.entryPoint.className === classArea.getClassName())) {    
         if ((classArea.getAccessFlags() & ACCESS_FLAGS.ACC_PUBLIC) !== 0) {
@@ -46,6 +46,23 @@ JVM.prototype.loadClassFile = function(classFileName) {
             }
         }
     }
+}
+
+JVM.prototype.getNewFrame = function(className, method) {
+    
+    var classArea = this.classes[className];
+    
+    if (!classArea) {
+        return null;
+    }
+    
+    var methods = classArea.getMethods();
+    var constantPool = classArea.getPoolConstant();
+    for(var i=0; i<methods.length; i++) {
+        if (constantPool[methods[i].name_index].bytes === method) {
+            return new Frame(classArea, methods[i]);    
+        }
+    }    
 }
 
 JVM.prototype.run = function() {
@@ -102,10 +119,20 @@ JVM.prototype.run = function() {
                     args.push(frame.STACK.pop());
                 }
 
-                var ctor = require(util.format("%s/%s.js", __dirname, packageClassName));
-                var res = ctor[method].apply(null, args.reverse());
-                if (argsType.OUT.length != 0) {
-                    frame.STACK.push(res);
+                var aNewFrame = this.getNewFrame(packageClassName, method);
+                
+                if (aNewFrame) {                    
+                    this.frames.push(frame);
+                    frame = aNewFrame;
+                    for(var i=0; i<args.length; i++) {
+                        frame.LOCALS[i] = args[i];
+                    }                    
+                } else {                
+                    var ctor = require(util.format("%s/%s.js", __dirname, packageClassName));
+                    var res = ctor[method].apply(null, args.reverse());
+                    if (argsType.OUT.length != 0) {
+                        frame.STACK.push(res);
+                    }
                 }
                 break;
             
@@ -273,6 +300,16 @@ JVM.prototype.run = function() {
             case Opcodes.pop:
                 frame.STACK.pop();
                 break;
+                        
+            case Opcodes.iadd:
+            case Opcodes.ladd:
+                frame.STACK.push(frame.STACK.pop() + frame.STACK.pop());
+                break;
+            
+            case Opcodes.isub:
+            case Opcodes.lsub:
+                frame.STACK.push(- frame.STACK.pop() + frame.STACK.pop());
+                break;
             
             case Opcodes.aastore:
                 var val = frame.STACK.pop();
@@ -291,6 +328,16 @@ JVM.prototype.run = function() {
                 var ref1 = frame.STACK.pop();
                 var ref2 = frame.STACK.pop();
                 frame.IP = ref1 === ref2 ? jmp : frame.IP;
+                break;
+            
+            case Opcodes.if_icmpgt:
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
+                var ref1 = frame.STACK.pop();
+                var ref2 = frame.STACK.pop();
+                frame.IP = ref1 < ref2 ? jmp : frame.IP;                
+                break;
+            
+            case Opcodes.i2l:                
                 break;
             
             case Opcodes.aaload:
@@ -317,6 +364,13 @@ JVM.prototype.run = function() {
             
             case Opcodes.goto:                
                 frame.IP += Helper.getSInt(frame.read16()) - 1;
+                break;
+            
+            case Opcodes.ireturn:
+            case Opcodes.lreturn:
+                var result = frame.STACK.pop();
+                frame = this.frames.pop();
+                frame.STACK.push(result);
                 break;
             
             case Opcodes.return:
