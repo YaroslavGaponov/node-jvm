@@ -69,7 +69,7 @@ JVM.prototype.run = function() {
                 var staticField = frame.getConstant(frame.read16());                
                 var packageName = frame.getConstant(frame.getConstant(staticField.class_index).name_index).bytes;
                 var className = frame.getConstant(frame.getConstant(staticField.name_and_type_index).name_index).bytes;                
-                frame.STACK.push(require(util.format("%s/%s/%s", __dirname, packageName, className)));
+                frame.STACK.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));
                 break;
             case Opcodes.ldc:
                 var constant = frame.getConstant(frame.read8());
@@ -86,6 +86,7 @@ JVM.prototype.run = function() {
                 var packageClassName = frame.getConstant(frame.getConstant(staticMethod.class_index).name_index).bytes;
                 var method = frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).name_index).bytes;                
                 var argsType = frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).signature_index).bytes;
+                
                 args = [];
                 switch(argsType) {                    
                     case "(Ljava/lang/String;)I":                        
@@ -100,12 +101,17 @@ JVM.prototype.run = function() {
                     default:
                         throw new Error("Not support type " + argsType);
                 }
-                frame.STACK.push(require(util.format("%s/%s/%s", __dirname, packageClassName, method)).apply(null, args));
+                var ctor = require(util.format("%s/%s.js", __dirname, packageClassName));
+                var result = ctor[method].apply(null, args);
+                if (result) {
+                    frame.STACK.push(result);
+                }
                 break;
-            case Opcodes.invokevirtual:                
+            case Opcodes.invokevirtual:
                 var methodRefIndex = frame.read16();
                 var methodName = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).name_index).bytes;
                 var argsType = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).signature_index).bytes;
+                
                 var args = [];
                 switch (argsType) {
                     case "()V":
@@ -119,12 +125,47 @@ JVM.prototype.run = function() {
                         args.push(frame.STACK.pop());
                         args = args.reverse();
                         break;
+                    case "(I)Ljava/lang/StringBuilder;":                        
+                        args.push(frame.STACK.pop());
+                        break;
+                    case "()Ljava/lang/String;":
+                        break;
+                    case "(Ljava/lang/String;)Ljava/lang/StringBuilder;":
+                        args.push(frame.STACK.pop());
+                        break;
+                    default:
+                        throw new Error("Not support type " + argsType);                    
+                }
+                var obj = frame.STACK.pop();
+                var result = obj[methodName].apply(obj, args);
+                if (result) {
+                    frame.STACK.push(result);
+                }
+                break;
+            case Opcodes.new:
+                var className = frame.getConstant(frame.getConstant(frame.read16()).name_index).bytes;
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                frame.STACK.push(new ctor());
+                break;
+            case Opcodes.invokespecial:
+                var methodRefIndex = frame.read16();
+                var methodName = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).name_index).bytes;
+                var argsType = frame.getConstant(frame.getConstant(frame.getConstant(methodRefIndex).name_and_type_index).signature_index).bytes;
+                var args = [];
+                switch (argsType) {
+                    case "(Ljava/lang/String;)V":
+                        args.push(frame.STACK.pop());
+                        break;                    
                     default:
                         throw new Error("Not support type " + argsType);
                     
                 }
-                frame.STACK.pop()[methodName].apply(null, args);                
-                break;            
+                var obj = frame.STACK.pop();
+                var result = obj[methodName].apply(obj, args);
+                if (result) {
+                    frame.STACK.push(result);
+                }
+                break;
             case Opcodes.iconst_0:
                 frame.STACK.push(0);
                 break;

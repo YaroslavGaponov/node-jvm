@@ -1,5 +1,0 @@
-
-module.exports = function() {
-    if (arguments.length === 0) return "0";
-    return arguments[0].toString();
-}
