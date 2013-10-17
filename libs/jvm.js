@@ -48,7 +48,6 @@ JVM.prototype.loadClassFile = function(classFileName) {
     }
 }
 
-
 JVM.prototype.run = function() {
         
     if (this.frames.length === 0) {
@@ -64,7 +63,14 @@ JVM.prototype.run = function() {
     while(true) {
         var cmd = frame.read8();
         switch(cmd) {
+            
             case Opcodes.nop:
+                break;
+
+            case Opcodes.new:
+                var className = frame.getConstant(frame.getConstant(frame.read16()).name_index).bytes;
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                frame.STACK.push(new ctor());
                 break;
             
             case Opcodes.getstatic:
@@ -91,7 +97,7 @@ JVM.prototype.run = function() {
                 var method = frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).name_index).bytes;                
                 var argsType = Signature.parse(frame.getConstant(frame.getConstant(staticMethod.name_and_type_index).signature_index).bytes);
                 
-                args = [];
+                var args = [];
                 for (var i=0; i<argsType.IN.length; i++) {
                     args.push(frame.STACK.pop());
                 }
@@ -118,12 +124,6 @@ JVM.prototype.run = function() {
                 if (argsType.OUT.length != 0) {
                     frame.STACK.push(res);
                 }
-                break;
-            
-            case Opcodes.new:
-                var className = frame.getConstant(frame.getConstant(frame.read16()).name_index).bytes;
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                frame.STACK.push(new ctor());
                 break;
             
             case Opcodes.invokespecial:
@@ -240,24 +240,18 @@ JVM.prototype.run = function() {
                 break;
             
             case Opcodes.ifne:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
-                if (frame.STACK.pop() !== 0) {
-                    frame.IP = jmp;
-                }                
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() !== 0 ? jmp : frame.IP;
                 break;
             
             case Opcodes.if_icmple:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
-                if (frame.STACK.pop() >= frame.STACK.pop()) {
-                    frame.IP = jmp;
-                }
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() >= frame.STACK.pop() ? jmp : frame.IP;
                 break;
             
             case Opcodes.if_icmplt:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
-                if (frame.STACK.pop() > frame.STACK.pop()) {
-                    frame.IP = jmp;
-                }
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() > frame.STACK.pop() ? jmp : frame.IP;
                 break;
             
             case Opcodes.iinc:
@@ -296,9 +290,7 @@ JVM.prototype.run = function() {
                 var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());                                
                 var ref1 = frame.STACK.pop();
                 var ref2 = frame.STACK.pop();
-                if (ref1 === ref2) {
-                    frame.IP = jmp;
-                }
+                frame.IP = ref1 === ref2 ? jmp : frame.IP;
                 break;
             
             case Opcodes.aaload:
