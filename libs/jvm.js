@@ -84,17 +84,51 @@ JVM.prototype.run = function() {
             case Opcodes.nop:
                 break;
 
-            case Opcodes.new:
-                var className = frame.getConstant(frame.getConstant(frame.read16()).name_index).bytes;
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                frame.STACK.push(new ctor());
+            case Opcodes.aconst_null:
+                frame.STACK.push(null);
                 break;
             
-            case Opcodes.getstatic:
-                var staticField = frame.getConstant(frame.read16());                
-                var packageName = frame.getConstant(frame.getConstant(staticField.class_index).name_index).bytes;
-                var className = frame.getConstant(frame.getConstant(staticField.name_and_type_index).name_index).bytes;                
-                frame.STACK.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));
+            case Opcodes.iconst_m1:
+                frame.STACK.push(-1);
+                break;
+            
+            case Opcodes.iconst_0:
+            case Opcodes.lconst_0:
+            case Opcodes.fconst_0:
+            case Opcodes.dconst_0:
+                frame.STACK.push(0);
+                break;
+            
+            case Opcodes.iconst_1:
+            case Opcodes.lconst_1:
+            case Opcodes.fconst_1:
+            case Opcodes.dconst_1:                
+                frame.STACK.push(1);
+                break;
+            
+            case Opcodes.iconst_2:
+            case Opcodes.fconst_2:
+                frame.STACK.push(2);
+                break;
+            
+            case Opcodes.iconst_3:
+                frame.STACK.push(4);
+                break;
+            
+            case Opcodes.iconst_4:
+                frame.STACK.push(4);
+                break;
+            
+            case Opcodes.iconst_5:
+                frame.STACK.push(5);
+                break;
+            
+            case Opcodes.sipush:
+                frame.STACK.push(frame.read16());
+                break;
+            
+            case Opcodes.bipush:
+                frame.STACK.push(frame.read8());
                 break;
             
             case Opcodes.ldc:
@@ -106,6 +140,149 @@ JVM.prototype.run = function() {
                     default:
                         throw new Error("not support constant type");
                 }
+                break;
+            
+            case Opcodes.ldc_w:
+            case Opcodes.ldc2_w:
+                var constant = frame.getConstant(frame.read16());
+                switch(constant.tag) {
+                    case TAGS.CONSTANT_String:                        
+                        frame.STACK.push(frame.getConstant(constant.string_index).bytes);
+                        break;
+                    default:
+                        throw new Error("not support constant type");
+                }
+                break;
+
+            case Opcodes.iload:
+            case Opcodes.lload:
+            case Opcodes.fload:
+            case Opcodes.dload:
+            case Opcodes.aload:
+                frame.STACK.push(frame.LOCALS[frame.read8()]);
+                break;
+                
+            case Opcodes.iload_0:
+            case Opcodes.lload_0:
+            case Opcodes.fload_0:
+            case Opcodes.dload_0:
+            case Opcodes.aload_0:
+                frame.STACK.push(frame.LOCALS[0]);
+                break;
+            
+            case Opcodes.iload_1:
+            case Opcodes.lload_1:
+            case Opcodes.fload_1:
+            case Opcodes.dload_1:
+            case Opcodes.aload_1:            
+                frame.STACK.push(frame.LOCALS[1]);
+                break;
+            
+            case Opcodes.iload_2:
+            case Opcodes.lload_2:
+            case Opcodes.fload_2:
+            case Opcodes.dload_2:
+            case Opcodes.aload_2:                
+                frame.STACK.push(frame.LOCALS[2]);
+                break;
+            
+            case Opcodes.iload_3:
+            case Opcodes.lload_3:
+            case Opcodes.fload_3:
+            case Opcodes.dload_3:
+            case Opcodes.aload_3:
+                frame.STACK.push(frame.LOCALS[3]);
+                break;
+                
+            case Opcodes.iaload:
+            case Opcodes.laload:
+            case Opcodes.faload:
+            case Opcodes.daload:
+            case Opcodes.aaload:
+            case Opcodes.baload:
+            case Opcodes.caload:
+            case Opcodes.saload:
+                var indx = frame.STACK.pop();
+                var refArray = frame.STACK.pop();
+                frame.STACK.push(refArray[indx]);
+                break;
+
+            case Opcodes.istore:
+            case Opcodes.lstore:
+            case Opcodes.fstore:
+            case Opcodes.dstore:
+            case Opcodes.astore:
+                frame.LOCALS[frame.read8()] = frame.STACK.pop();
+                break;
+            
+            case Opcodes.istore_0:
+            case Opcodes.lstore_0:
+            case Opcodes.fstore_0:
+            case Opcodes.dstore_0:
+            case Opcodes.astore_0:
+                frame.LOCALS[0] = frame.STACK.pop();
+                break;
+            
+            case Opcodes.istore_1:
+            case Opcodes.lstore_1:
+            case Opcodes.fstore_1:
+            case Opcodes.dstore_1:
+            case Opcodes.astore_1:                
+                frame.LOCALS[1] = frame.STACK.pop();
+                break;
+            
+            case Opcodes.istore_2:
+            case Opcodes.lstore_2:
+            case Opcodes.fstore_2:
+            case Opcodes.dstore_2:
+            case Opcodes.astore_2:                
+                frame.LOCALS[2] = frame.STACK.pop();
+                break;
+            
+            case Opcodes.istore_3:
+            case Opcodes.lstore_3:
+            case Opcodes.fstore_3:
+            case Opcodes.dstore_3:
+            case Opcodes.astore_3:                
+                frame.LOCALS[3] = frame.STACK.pop();
+                break;
+
+            case Opcodes.iastore:
+            case Opcodes.lastore:
+            case Opcodes.fastore:
+            case Opcodes.dastore:
+            case Opcodes.aastore:
+            case Opcodes.bastore:
+            case Opcodes.castore:
+            case Opcodes.sastore:
+                var refArray = frame.STACK.pop();
+                var indx = frame.STACK.pop();
+                var val = frame.STACK.pop();
+                refArray[indx] = val;
+                break;
+
+            case Opcodes.pop:
+            case Opcodes.pop2:
+                frame.STACK.pop();
+                break;
+            
+            case Opcodes.dup:
+                var ref = frame.STACK.pop();
+                frame.STACK.push(ref);
+                frame.STACK.push(ref);
+                break;
+            
+            case Opcodes.new:
+                var className = frame.getConstant(frame.getConstant(frame.read16()).name_index).bytes;
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                frame.STACK.push(new ctor());
+                break;
+            
+            case Opcodes.getstatic:
+                var staticField = frame.getConstant(frame.read16());                
+                var packageName = frame.getConstant(frame.getConstant(staticField.class_index).name_index).bytes;
+                var className = frame.getConstant(frame.getConstant(staticField.name_and_type_index).name_index).bytes;                
+                frame.STACK.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));
                 break;
             
             case Opcodes.invokestatic:
@@ -169,103 +346,7 @@ JVM.prototype.run = function() {
                     frame.STACK.push(res);
                 }
                 break;
-            
-            case Opcodes.iconst_0:
-                frame.STACK.push(0);
-                break;
-            
-            case Opcodes.iconst_1:
-                frame.STACK.push(1);
-                break;
-            
-            case Opcodes.iconst_2:
-                frame.STACK.push(2);
-                break;
-            
-            case Opcodes.iconst_3:
-                frame.STACK.push(4);
-                break;
-            
-            case Opcodes.iconst_4:
-                frame.STACK.push(4);
-                break;
-            
-            case Opcodes.iconst_5:
-                frame.STACK.push(5);
-                break;
-            
-           case Opcodes.istore:
-                frame.LOCALS[frame.read8()] = frame.STACK.pop();
-                break;
-            
-           case Opcodes.istore_0:
-                frame.LOCALS[0] = frame.STACK.pop();
-                break;
-            
-            case Opcodes.istore_1:
-                frame.LOCALS[1] = frame.STACK.pop();
-                break;
-            
-            case Opcodes.istore_2:
-                frame.LOCALS[2] = frame.STACK.pop();
-                break;
-            
-            case Opcodes.istore_3:
-                frame.LOCALS[3] = frame.STACK.pop();
-                break;
-            
-            case Opcodes.aload_0:
-                frame.STACK.push(frame.LOCALS[0]);
-                break;
-            
-            case Opcodes.aload_1:
-                frame.STACK.push(frame.LOCALS[1]);
-                break;
-            
-            case Opcodes.aload_2:
-                frame.STACK.push(frame.LOCALS[2]);
-                break;
-            
-            case Opcodes.aload_3:
-                frame.STACK.push(frame.LOCALS[3]);
-                break;
-            
-            case Opcodes.iload:
-                frame.STACK.push(frame.LOCALS[frame.read8()]);
-                break;
-            
-            case Opcodes.iload_0:
-                frame.STACK.push(frame.LOCALS[0]);
-                break;
-            
-            case Opcodes.iload_1:
-                frame.STACK.push(frame.LOCALS[1]);
-                break;
-            
-            case Opcodes.iload_2:
-                frame.STACK.push(frame.LOCALS[2]);
-                break;
-            
-            case Opcodes.iload_3:
-                frame.STACK.push(frame.LOCALS[3]);
-                break;
-
-            case Opcodes.lconst_0:
-                frame.STACK.push(0);
-                break;
-            
-            case Opcodes.lconst_1:
-                frame.STACK.push(1);
-                break;
-            
-            case Opcodes.sipush:
-                frame.STACK.push(frame.read16());
-                break;
-            
-            case Opcodes.bipush:
-                frame.STACK.push(frame.read8());
-                break;
-            
+        
             case Opcodes.ifne:
                 var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
                 frame.IP = frame.STACK.pop() !== 0 ? jmp : frame.IP;
@@ -290,17 +371,7 @@ JVM.prototype.run = function() {
                 var size = frame.STACK.pop();
                 frame.STACK.push(new Array(size));                
                 break;
-            
-            case Opcodes.dup:
-                var ref = frame.STACK.pop();
-                frame.STACK.push(ref);
-                frame.STACK.push(ref);
-                break;
-            
-            case Opcodes.pop:
-                frame.STACK.pop();
-                break;
-                        
+
             case Opcodes.iadd:
             case Opcodes.ladd:
                 frame.STACK.push(frame.STACK.pop() + frame.STACK.pop());

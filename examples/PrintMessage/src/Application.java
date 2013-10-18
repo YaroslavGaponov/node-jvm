@@ -1,6 +1,8 @@
 
 public class Application {
 
+	private static final String hello = "Hello!!!";
+	private static final int PI = 3;
 	
 	public static long fib(int n) {
         if (n <= 1) return n;
@@ -8,6 +10,8 @@ public class Application {
     }
 	
 	public static void main(String[] args) {
+		System.out.println(hello);
+		int a = PI + 2;
 		
 		if (args.length == 0) {
 			System.out.print("help: java Application {Number}");
