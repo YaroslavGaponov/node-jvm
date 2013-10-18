@@ -136,7 +136,7 @@ var opcodes = module.exports = {
     "i2l": 0x85,
     "i2f": 0x86,
     "i2d": 0x87,
-    "l2f": 0x88,
+    "l2i": 0x88,
     "l2f": 0x89,
     "l2d": 0x8A,
     "f2i": 0x8B,

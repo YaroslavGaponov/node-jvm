@@ -255,10 +255,10 @@ JVM.prototype.run = function() {
             case Opcodes.bastore:
             case Opcodes.castore:
             case Opcodes.sastore:
-                var refArray = frame.STACK.pop();
-                var indx = frame.STACK.pop();
                 var val = frame.STACK.pop();
-                refArray[indx] = val;
+                var indx = frame.STACK.pop();                
+                var ref = frame.STACK.pop();                
+                ref[indx] = val;
                 break;
 
             case Opcodes.pop:
@@ -346,47 +346,29 @@ JVM.prototype.run = function() {
                     frame.STACK.push(res);
                 }
                 break;
-        
-            case Opcodes.ifne:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
-                frame.IP = frame.STACK.pop() !== 0 ? jmp : frame.IP;
-                break;
-            
-            case Opcodes.if_icmple:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
-                frame.IP = frame.STACK.pop() >= frame.STACK.pop() ? jmp : frame.IP;
-                break;
-            
-            case Opcodes.if_icmplt:
-                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
-                frame.IP = frame.STACK.pop() > frame.STACK.pop() ? jmp : frame.IP;
-                break;
             
             case Opcodes.iinc:
                 frame.LOCALS[frame.read8()] += frame.read8();
                 break;
             
-            case Opcodes.anewarray:
-                var type = frame.read16();
-                var size = frame.STACK.pop();
-                frame.STACK.push(new Array(size));                
-                break;
-
             case Opcodes.iadd:
             case Opcodes.ladd:
+            case Opcodes.dadd:
+            case Opcodes.fadd:
                 frame.STACK.push(frame.STACK.pop() + frame.STACK.pop());
                 break;
             
             case Opcodes.isub:
             case Opcodes.lsub:
+            case Opcodes.dsub:
+            case Opcodes.fsub:
                 frame.STACK.push(- frame.STACK.pop() + frame.STACK.pop());
                 break;
-            
-            case Opcodes.aastore:
-                var val = frame.STACK.pop();
-                var indx = frame.STACK.pop();                
-                var ref = frame.STACK.pop();                
-                ref[indx] = val;
+
+            case Opcodes.anewarray:
+                var type = frame.read16();
+                var size = frame.STACK.pop();
+                frame.STACK.push(new Array(size));                
                 break;
             
             case Opcodes.arraylength:
@@ -408,29 +390,37 @@ JVM.prototype.run = function() {
                 frame.IP = ref1 < ref2 ? jmp : frame.IP;                
                 break;
             
-            case Opcodes.i2l:                
+            case Opcodes.ifne:
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() !== 0 ? jmp : frame.IP;
                 break;
             
-            case Opcodes.aaload:
-                var indx = frame.STACK.pop();
-                var ref = frame.STACK.pop();                
-                frame.STACK.push(ref[indx]);
+            case Opcodes.if_icmple:
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() >= frame.STACK.pop() ? jmp : frame.IP;
                 break;
             
-            case Opcodes.astore_0:
-                frame.LOCALS[0] = frame.STACK.pop();
+            case Opcodes.if_icmplt:
+                var jmp = frame.IP - 1 + Helper.getSInt(frame.read16());
+                frame.IP = frame.STACK.pop() > frame.STACK.pop() ? jmp : frame.IP;
                 break;
             
-            case Opcodes.astore_1:
-                frame.LOCALS[1] = frame.STACK.pop();
-                break;
-
-            case Opcodes.astore_2:
-                frame.LOCALS[2] = frame.STACK.pop();
-                break;
-
-            case Opcodes.astore_3:
-                frame.LOCALS[3] = frame.STACK.pop();
+            
+            case Opcodes.i2l:
+            case Opcodes.i2f:
+            case Opcodes.i2d:
+            case Opcodes.i2b:
+            case Opcodes.i2c:
+            case Opcodes.i2s:                
+            case Opcodes.l2i:
+            case Opcodes.l2d:
+            case Opcodes.l2f:                
+            case Opcodes.d2i:
+            case Opcodes.d2l:
+            case Opcodes.d2f:                
+            case Opcodes.f2d:
+            case Opcodes.f2i:
+            case Opcodes.f2l:            
                 break;
             
             case Opcodes.goto:                
