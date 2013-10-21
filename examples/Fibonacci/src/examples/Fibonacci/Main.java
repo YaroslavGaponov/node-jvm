@@ -6,6 +6,7 @@ public class Main {
         if (n <= 1) return n;
         else return fib(n-1) + fib(n-2);
     }
+	
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
@@ -21,7 +22,6 @@ public class Main {
 		}
 		
 		System.out.println("done.");
-
 	}
 
 }
