@@ -73,8 +73,7 @@ JVM.prototype.run = function() {
     
     if (!entryPointFrame) {
         throw new Error("Entry point method is not found.");
-    }
-    
+    }    
     
     process.exit(
         entryPointFrame.run(arguments)
