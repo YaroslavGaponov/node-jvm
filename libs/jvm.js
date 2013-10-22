@@ -31,7 +31,7 @@ JVM.prototype.api = function() {
     var self = this;
     
     var API = {
-        getStaticMethod: function(className, method) {    
+        getMethod: function(className, method) {    
             var classArea = self.classes[className];
             
             if (!classArea) {

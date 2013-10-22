@@ -65,7 +65,7 @@ Frame.prototype.run = function() {
     while(!this._end) {
         var opName = Opcodes.toString(this._read8());
         if (!this[opName]) {
-            throw new Error(util.format("Opcode [%s] is not support. ", opcodeName));
+            throw new Error(util.format("Opcode [%s] is not support. ", opName));
         }
         res = this[opName]();        
     }
@@ -513,19 +513,6 @@ Frame.prototype.dup = function() {
     this._stack.push(ref);
 }
 
-
-Frame.prototype.new = function() {
-    var className = this._get(this._get(this._read16()).name_index).bytes;    
-    this._stack.push(this._api.createNewObject(className));
-}
-
-Frame.prototype.getstatic = function() {
-    var staticField = this._get(this._read16());                
-    var packageName = this._get(this._get(staticField.class_index).name_index).bytes;
-    var className = this._get(this._get(staticField.name_and_type_index).name_index).bytes;                
-    this._stack.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));    
-}
-
 Frame.prototype.iinc = function() {
     this._locals[this._read8()] += this._read8();    
 }
@@ -666,6 +653,34 @@ Frame.prototype.return = function() {
     return;
 }
 
+Frame.prototype.putfield = function() {
+    var fieldNameIndex = this._read16();
+    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;    
+    var val = this._stack.pop();
+    var obj = this._stack.pop();
+    obj[fieldName] = val;
+}
+
+Frame.prototype.getfield = function() {
+    var fieldNameIndex = this._read16();
+    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;    
+    var obj = this._stack.pop();
+    this._stack.push(obj[fieldName]);
+}
+
+
+Frame.prototype.new = function() {
+    var className = this._get(this._get(this._read16()).name_index).bytes;    
+    this._stack.push(this._api.createNewObject(className));
+}
+
+Frame.prototype.getstatic = function() {
+    var staticField = this._get(this._read16());                
+    var packageName = this._get(this._get(staticField.class_index).name_index).bytes;
+    var className = this._get(this._get(staticField.name_and_type_index).name_index).bytes;                
+    this._stack.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));    
+}
+
 
 Frame.prototype.invokestatic = function() {
     var indx = this._read16();
@@ -673,21 +688,21 @@ Frame.prototype.invokestatic = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    console.log();console.log("invokestatic: " + className + "." + methodName);console.log();
+    //console.log();console.log("invokestatic: " + className + "." + methodName);console.log();
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
         args.push(this._stack.pop());
     }
 
-    var staticMethod = this._api.getStaticMethod(className, methodName);
+    var staticMethod = this._api.getMethod(className, methodName);
    
     var res;
     
     if (staticMethod instanceof Frame) {
-        res = staticMethod.run.apply(staticMethod, args.reverse());
+        res = staticMethod.run.apply(staticMethod, args);
     } else {        
-        res = staticMethod.apply(null, args.reverse());
+        res = staticMethod.apply(null, args);
     }
     
     if (argsType.OUT.length != 0) {                        
@@ -702,7 +717,7 @@ Frame.prototype.invokevirtual = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    console.log();console.log("invokevirtual: " + className + "." + methodName);console.log();
+    //console.log();console.log("invokevirtual: " + className + "." + methodName);console.log();
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
@@ -711,14 +726,13 @@ Frame.prototype.invokevirtual = function() {
     
     var obj = this._stack.pop();
     
-    var res;
-    
-    if (obj[methodName] instanceof Frame) {    
-        res = obj[methodName].run.apply(obj, args.reverse());
+    var res;    
+    if (obj[methodName] instanceof Frame) {
+        res = obj[methodName].run.apply(obj[methodName], args.unshift(obj).reverse());
     } else {
         res = obj[methodName].apply(obj, args.reverse());
     }
-    
+        
     if (argsType.OUT.length != 0) {
         this._stack.push(res);
     }    
@@ -731,19 +745,22 @@ Frame.prototype.invokespecial = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    console.log();console.log("invokespecial: " + className + "." + methodName);console.log();
-    
+    //console.log();console.log("invokespecial: " + className + "." + methodName);console.log();
+
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
         args.push(this._stack.pop());
     }
+
+    var obj = this._stack.pop();
+        
+    args.unshift(obj);
     
-    var obj = this._stack.pop();    
-    var res;
+    args = args.reverse();
     
+    var res;    
     if (obj[methodName] instanceof Frame) {
-        console.log(obj);
-        res = obj[methodName].run.apply(obj, args.reverse());
+        res = obj[methodName].run.apply(obj[methodName], args.unshift(obj).reverse());
     } else {
         res = obj[methodName].apply(obj, args.reverse());
     }
