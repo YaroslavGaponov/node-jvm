@@ -399,7 +399,7 @@ Frame.prototype.dstore_1 = function() {
 }
 
 Frame.prototype.astore_1 = function() {
-    this._locals[1] = this._stack.pop();    
+    this._locals[1] = this._stack.pop();
 }
 
 
@@ -661,11 +661,11 @@ Frame.prototype.putfield = function() {
     obj[fieldName] = val;
 }
 
-Frame.prototype.getfield = function() {
+Frame.prototype.getfield = function() {    
     var fieldNameIndex = this._read16();
-    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;    
+    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;
     var obj = this._stack.pop();
-    this._stack.push(obj[fieldName]);
+    this._stack.push(obj[fieldName]);    
 }
 
 
@@ -677,7 +677,7 @@ Frame.prototype.new = function() {
 Frame.prototype.getstatic = function() {
     var staticField = this._get(this._read16());                
     var packageName = this._get(this._get(staticField.class_index).name_index).bytes;
-    var className = this._get(this._get(staticField.name_and_type_index).name_index).bytes;                
+    var className = this._get(this._get(staticField.name_and_type_index).name_index).bytes;
     this._stack.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));    
 }
 
@@ -700,8 +700,10 @@ Frame.prototype.invokestatic = function() {
     var res;
     
     if (staticMethod instanceof Frame) {
+        args.reverse();
         res = staticMethod.run.apply(staticMethod, args);
-    } else {        
+    } else {
+        args.reverse();
         res = staticMethod.apply(null, args);
     }
     
@@ -711,6 +713,9 @@ Frame.prototype.invokestatic = function() {
 
 }
 
+/*
+ *@description some instance method 
+ */
 Frame.prototype.invokevirtual = function() {
     var indx = this._read16();
     var className = this._get(this._get(this._get(indx).class_index).name_index).bytes;
@@ -721,16 +726,18 @@ Frame.prototype.invokevirtual = function() {
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
-        args.push(this._stack.pop());
+        args.unshift(this._stack.pop());
     }
     
     var obj = this._stack.pop();
+    var o = this._api.createNewObject(className);
     
     var res;    
-    if (obj[methodName] instanceof Frame) {
-        res = obj[methodName].run.apply(obj[methodName], args.unshift(obj).reverse());
+    if (o[methodName] instanceof Frame) {
+        args.unshift(obj);
+        res = o[methodName].run.apply(obj[methodName], args);
     } else {
-        res = obj[methodName].apply(obj, args.reverse());
+        res = o[methodName].apply(obj, args);
     }
         
     if (argsType.OUT.length != 0) {
@@ -738,7 +745,9 @@ Frame.prototype.invokevirtual = function() {
     }    
 }
 
-
+/*
+ * @description ctor method runner
+ */
 Frame.prototype.invokespecial = function() {
     var indx = this._read16();
     var className = this._get(this._get(this._get(indx).class_index).name_index).bytes;
@@ -753,21 +762,16 @@ Frame.prototype.invokespecial = function() {
     }
 
     var obj = this._stack.pop();
-        
-    args.unshift(obj);
+    var o = this._api.createNewObject(className);
     
-    args = args.reverse();
-    
-    var res;    
-    if (obj[methodName] instanceof Frame) {
-        res = obj[methodName].run.apply(obj[methodName], args.unshift(obj).reverse());
-    } else {
-        res = obj[methodName].apply(obj, args.reverse());
+    if (o[methodName] instanceof Frame) {
+        args.unshift(obj);
+        o[methodName].run.apply(obj[methodName], args);
+    } else {        
+        o[methodName].apply(obj, args);
     }
     
-    if (argsType.OUT.length != 0) {
-        this._stack.push(res);
-    }    
+    this._stack.push(obj);    
 }
 
 

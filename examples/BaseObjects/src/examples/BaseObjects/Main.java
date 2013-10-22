@@ -14,7 +14,7 @@ class Dog {
 public class Main {
 
 	public static void main(String[] args) {
-		Dog dog = new Dog("Small");
+		Dog dog = new Dog(args[0]);
 		dog.say("hello, nice day!");
 		
 	}

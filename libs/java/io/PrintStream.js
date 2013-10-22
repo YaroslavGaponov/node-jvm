@@ -8,15 +8,15 @@ var out = module.exports = function() {
 };
 
     
-out["print"] = function() {
+out.prototype["print"] = function() {
     util.print.apply(null, arguments);
 };
 
-out["println"] = function() {
+out.prototype["println"] = function() {
     util.print.apply(null, arguments);
     util.print("\n");
 };
 
-out["format"] = function(fmt, args) {
+out.prototype["format"] = function(fmt, args) {
     util.print(util.format.apply(null, [fmt].concat(args)));
 }
