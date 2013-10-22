@@ -27,22 +27,24 @@ JVM.prototype.loadClassFile = function(classFileName) {
 }
 
 
-JVM.prototype.getNewFrame = function() {
+JVM.prototype.api = function() {
     var self = this;
-    return function(className, method) {    
-        var classArea = self.classes[className];
-        
-        if (!classArea) {
-            return null;
-        }
-        
-        var methods = classArea.getMethods();
-        var constantPool = classArea.getPoolConstant();
-        for(var i=0; i<methods.length; i++) {
-            if (constantPool[methods[i].name_index].bytes === method) {
-                return new Frame(self.getNewFrame(), classArea, methods[i]);    
+    return {
+        getStaticFrame: function(className, method) {    
+            var classArea = self.classes[className];
+            
+            if (!classArea) {
+                return null;
             }
-        }    
+            
+            var methods = classArea.getMethods();
+            var constantPool = classArea.getPoolConstant();
+            for(var i=0; i<methods.length; i++) {
+                if (constantPool[methods[i].name_index].bytes === method) {
+                    return new Frame(self.api(), classArea, methods[i]);    
+                }
+            }    
+        }
     }
 }
 
@@ -64,7 +66,7 @@ JVM.prototype.run = function() {
                         (constantPool[methods[i].name_index].bytes === this.entryPoint.methodName)
                     )
                     {
-                        entryPointFrame = new Frame(this.getNewFrame(), classArea, methods[i]);    
+                        entryPointFrame = new Frame(this.api(), classArea, methods[i]);    
                     }
                 }
             }

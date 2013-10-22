@@ -1,19 +1,22 @@
 package examples.BaseObjects;
 
+class Dog {
+	private String name;
+	public Dog(String name) {
+		this.name = name;
+	}
+	
+	public void say(String message) {
+		System.out.format("%s says: %s", name, message);
+	}
+}
+
 public class Main {
 
 	public static void main(String[] args) {
-		Object o = new Object();		
-		System.out.println(o.toString());
+		Dog dog = new Dog("Small");
+		dog.say("hello, nice day!");
 		
-		StringBuilder sb = new StringBuilder("hello");
-		sb.append(" test 1");
-		sb.append(" test 2");
-		sb.append(" test 3");
-		System.out.println(sb.toString());
-		
-		System.out.println(sb.equals(sb));
-		System.out.println(sb.equals(o));
 	}
 
 }

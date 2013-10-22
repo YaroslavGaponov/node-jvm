@@ -6,10 +6,10 @@ var Signature = require("./classfile/signature.js");
 var TAGS = require("./classfile/tags.js");
 var ATTRIBUTE_TYPES = require("./classfile/attributetypes.js");
 
-var Frame = module.exports = function(getNewFrame, classArea, method) {
+var Frame = module.exports = function(api, classArea, method) {
     if (this instanceof Frame) {
         
-        this._getNewFrame = getNewFrame;
+        this._api = api;
         this._classArea = classArea;
         this._method = method;
         
@@ -27,7 +27,7 @@ var Frame = module.exports = function(getNewFrame, classArea, method) {
         this._end = false;
         
     } else {
-        return new Frame(getNewFrame, classArea, method);
+        return new Frame(api, classArea, method);
     }
 }
 
@@ -531,7 +531,7 @@ Frame.prototype.invokestatic = function() {
         args.push(this._stack.pop());
     }
 
-    var aNewFrame = this._getNewFrame(packageClassName, method);
+    var aNewFrame = this._api.getStaticFrame(packageClassName, method);
     
     if (aNewFrame) {                    
         var res = aNewFrame.run.apply(aNewFrame, args);
