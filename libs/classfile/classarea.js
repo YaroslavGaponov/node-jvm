@@ -27,6 +27,10 @@ ClassArea.prototype.getPoolConstant = function() {
     return this.classImage.constant_pool;
 }
 
+ClassArea.prototype.getFields = function() {
+    return this.classImage.fields;
+}
+
 ClassArea.prototype.getMethods = function() {
     return this.classImage.methods;
 }

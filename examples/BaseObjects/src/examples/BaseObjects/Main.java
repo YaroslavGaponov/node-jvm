@@ -7,7 +7,7 @@ class Dog {
 	}
 	
 	public void say(String message) {
-		System.out.format("%s says: %s", name, message);
+		System.out.print(name + " says: " + message);
 	}
 }
 

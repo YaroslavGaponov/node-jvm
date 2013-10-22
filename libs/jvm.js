@@ -29,23 +29,48 @@ JVM.prototype.loadClassFile = function(classFileName) {
 
 JVM.prototype.api = function() {
     var self = this;
-    return {
-        getStaticFrame: function(className, method) {    
+    
+    var API = {
+        getStaticMethod: function(className, method) {    
             var classArea = self.classes[className];
             
             if (!classArea) {
-                return null;
-            }
-            
-            var methods = classArea.getMethods();
-            var constantPool = classArea.getPoolConstant();
-            for(var i=0; i<methods.length; i++) {
-                if (constantPool[methods[i].name_index].bytes === method) {
-                    return new Frame(self.api(), classArea, methods[i]);    
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                return method === "<init>" ? ctor : ctor[method];
+            } else {            
+                var methods = classArea.getMethods();
+                var constantPool = classArea.getPoolConstant();
+                for(var i=0; i<methods.length; i++) {
+                    if (constantPool[methods[i].name_index].bytes === method) {
+                        return new Frame(self.api(), classArea, methods[i]);    
+                    }
                 }
-            }    
+            }
+        },
+        createNewObject: function(className) {
+            var classArea = self.classes[className];
+            
+            if (!classArea) {
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                return new ctor();
+            } else {
+                var o = {};
+                
+                classArea.getFields().forEach(function(field) {
+                    o[classArea.getPoolConstant()[field.name_index].bytes] = null;
+                });
+                
+                classArea.getMethods().forEach(function(method) {
+                    var methodName = classArea.getPoolConstant()[method.name_index].bytes;
+                    o[methodName] = new Frame(self.api(), classArea, method);
+                });
+                
+                return o;
+            }            
         }
-    }
+    };
+    
+    return API;
 }
 
 
