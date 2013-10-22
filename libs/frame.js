@@ -50,6 +50,13 @@ Frame.prototype._get = function(index) {
 
 Frame.prototype.run = function() {
     
+    this._ip = 0;
+    this._locals = new Array(4);
+    this._stack = [];
+    
+    this._end = false;
+    
+    
     for(var i=0; i<arguments.length; i++) {
         this._locals[i] = arguments[i];
     }    
@@ -666,7 +673,7 @@ Frame.prototype.invokestatic = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    // console.log();console.log("invokestatic: " + className + "." + methodName);console.log();
+    console.log();console.log("invokestatic: " + className + "." + methodName);console.log();
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
@@ -695,7 +702,7 @@ Frame.prototype.invokevirtual = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    // console.log();console.log("invokevirtual: " + className + "." + methodName);console.log();
+    console.log();console.log("invokevirtual: " + className + "." + methodName);console.log();
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
@@ -724,7 +731,7 @@ Frame.prototype.invokespecial = function() {
     var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
 
-    // console.log();console.log("invokespecial: " + className + "." + methodName);console.log();
+    console.log();console.log("invokespecial: " + className + "." + methodName);console.log();
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
@@ -735,6 +742,7 @@ Frame.prototype.invokespecial = function() {
     var res;
     
     if (obj[methodName] instanceof Frame) {
+        console.log(obj);
         res = obj[methodName].run.apply(obj, args.reverse());
     } else {
         res = obj[methodName].apply(obj, args.reverse());
