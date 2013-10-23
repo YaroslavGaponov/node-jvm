@@ -16,13 +16,10 @@ var Frame = module.exports = function(api, classArea, method) {
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
                 this._code = method.attributes[i].info.code;
+                this._max_locals = method.attributes[i].info.max_locals;
                 break;
             }
         }
-        
-        this._ip = 0;
-        this._locals = new Array(4);
-        this._stack = [];
         
         this._end = false;
         
@@ -51,7 +48,7 @@ Frame.prototype._get = function(index) {
 Frame.prototype.run = function() {
     
     this._ip = 0;
-    this._locals = new Array(4);
+    this._locals = new Array(this._max_locals);
     this._stack = [];
     
     this._end = false;
@@ -63,10 +60,10 @@ Frame.prototype.run = function() {
         
     var res = null;
     while(!this._end) {
-        var opcode = this._read8()
-        var opName = Opcodes.toString(opcode);
+        var opCode = this._read8()
+        var opName = Opcodes.toString(opCode);
         if (!this[opName]) {
-            throw new Error(util.format("Opcode [%s] is not support. ", opName));
+            throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
         }
         res = this[opName]();        
     }
@@ -688,9 +685,6 @@ Frame.prototype.getstatic = function() {
     this._stack.push(this._api.getStaticField(className, staticField));    
 }
 
-/*
- * @description static method
- */
 Frame.prototype.invokestatic = function() {
     var idx = this._read16();
     
@@ -718,9 +712,6 @@ Frame.prototype.invokestatic = function() {
     }
 }
 
-/*
- *@description some instance method 
- */
 Frame.prototype.invokevirtual = function() {
     var idx = this._read16();
     
@@ -749,9 +740,6 @@ Frame.prototype.invokevirtual = function() {
     }    
 }
 
-/*
- * @description ctor method
- */
 Frame.prototype.invokespecial = function() {
     var idx = this._read16();
     
@@ -804,7 +792,23 @@ Frame.prototype.invokeinterface = function() {
         
     if (argsType.OUT.length != 0) {
         this._stack.push(res);
-    }    
-    
+    }     
+}
+
+Frame.prototype.jsr = function() {
+    var jmp = this._read16();
+    this._stack.push(this._ip);
+    this._ip = jmp;
+}
+
+Frame.prototype.jsr_w = function() {
+    var jmp = this._read32();
+    this._stack.push(this._ip);
+    this._ip = jmp;
+}
+
+Frame.prototype.ret = function() {
+    var idx = this._read8();
+    this._ip = this._locals[idx];
 }
 
