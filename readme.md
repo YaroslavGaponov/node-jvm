@@ -8,6 +8,7 @@ node-jvm - jvm in pure node.js
 
 ## Example
 
+### java source
 ```java
 package examples.Fibonacci;
 
@@ -36,6 +37,7 @@ public class Main {
 }
 ```
 
+### node.js source
 ```javascript
 var JVM = require("../index");
 var jvm = new JVM();
