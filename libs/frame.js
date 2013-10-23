@@ -637,11 +637,45 @@ Frame.prototype.goto = function() {
     this._ip += Helper.getSInt(this._read16()) - 1;    
 }
 
+Frame.prototype.goto_W = function() {
+    this._ip += Helper.getSInt(this._read32()) - 1;    
+}
+
+Frame.prototype.ifnull = function() {
+    var ref = this._stack.pop();
+    if (!ref) {
+        this._ip += Helper.getSInt(this._read16()) - 1;
+    }
+}
+
+Frame.prototype.ifnonnull = function() {
+    var ref = this._stack.pop();
+    if (!!ref) {
+        this._ip += Helper.getSInt(this._read16()) - 1;
+    }
+}
+
 Frame.prototype.ireturn = function() {
     this._end = true;
     return this._stack.pop();
 }
+
 Frame.prototype.lreturn = function() {
+    this._end = true;
+    return this._stack.pop();
+}
+
+Frame.prototype.freturn = function() {
+    this._end = true;
+    return this._stack.pop();
+}
+
+Frame.prototype.dreturn = function() {
+    this._end = true;
+    return this._stack.pop();
+}
+
+Frame.prototype.areturn = function() {
     this._end = true;
     return this._stack.pop();
 }

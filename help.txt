@@ -1,10 +1,4 @@
 http://docs.oracle.com/javase/specs/jvms/se5.0/html/VMSpecTOC.doc.html
-http://www.uni-vologda.ac.ru/java/jvm/index.html
 http://habrahabr.ru/post/178315/
-http://docs.oracle.com/javase/specs/jvms/se5.0/html/Instructions2.doc7.html
-http://docs.oracle.com/javase/specs/jvms/se5.0/html/ClassFile.doc.html
 http://homepages.inf.ed.ac.uk/kwxm/JVM/codeByNo.html
 http://docs.oracle.com/javase/1.5.0/docs/tooldocs/windows/javap.html
-http://habrahabr.ru/post/111456/
-
-javap -v ./Application.class
