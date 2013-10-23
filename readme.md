@@ -64,6 +64,18 @@ Fibonacci from 1 to 10:
 done.
 ```
 
+### other examples
+`cd examples/`
+
+```
+baseobjects.js
+converter.js
+fibonacci.js
+interfaces.js
+probe.js
+```
+
+
 ## Contributors
 
 Yaroslav Gaponov (yaroslav.gaponov -at - gmail.com)
