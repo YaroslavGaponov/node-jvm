@@ -8,7 +8,7 @@ node-jvm - jvm in pure node.js
 
 ## Example
 
-### java source
+### java
 ```java
 package examples.Fibonacci;
 
@@ -37,12 +37,31 @@ public class Main {
 }
 ```
 
-### node.js source
+### node.js
 ```javascript
 var JVM = require("../index");
 var jvm = new JVM();
 jvm.loadClassFile("./Fibonacci/bin/examples/Fibonacci/Main.class");
 jvm.run([10]);
+```
+
+### run
+`node fibonacci.js`
+
+### output
+```
+Fibonacci from 1 to 10:
+1: 1
+2: 1
+3: 2
+4: 3
+5: 5
+6: 8
+7: 13
+8: 21
+9: 34
+10: 55
+done.
 ```
 
 ## Contributors
