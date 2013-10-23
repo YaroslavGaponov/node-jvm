@@ -63,7 +63,8 @@ Frame.prototype.run = function() {
         
     var res = null;
     while(!this._end) {
-        var opName = Opcodes.toString(this._read8());
+        var opcode = this._read8()
+        var opName = Opcodes.toString(opcode);
         if (!this[opName]) {
             throw new Error(util.format("Opcode [%s] is not support. ", opName));
         }
@@ -294,52 +295,52 @@ Frame.prototype.aload_3 = function() {
 }
 
 Frame.prototype.iaload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.laload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.faload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 
 Frame.prototype.daload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.aaload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.baload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.caload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.saload = function() {
-    var indx = this._stack.pop();
+    var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[indx]);                
+    this._stack.push(refArray[idx]);                
 }
 
 Frame.prototype.istore = function() {
@@ -445,58 +446,58 @@ Frame.prototype.astore_3 = function() {
 
 Frame.prototype.iastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.lastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.fastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.dastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.aastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.bastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.castore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.sastore = function() {
     var val = this._stack.pop();
-    var indx = this._stack.pop();                
+    var idx = this._stack.pop();                
     var ref = this._stack.pop();                
-    ref[indx] = val;    
+    ref[idx] = val;    
 }
 
 Frame.prototype.pop = function() {
@@ -654,90 +655,93 @@ Frame.prototype.return = function() {
 }
 
 Frame.prototype.putfield = function() {
-    var fieldNameIndex = this._read16();
-    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;    
+    var idx = this._read16();
+    
+    var fieldName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;    
     var val = this._stack.pop();
     var obj = this._stack.pop();
     obj[fieldName] = val;
 }
 
 Frame.prototype.getfield = function() {    
-    var fieldNameIndex = this._read16();
-    var fieldName = this._get(this._get(this._get(fieldNameIndex).name_and_type_index).name_index).bytes;
+    var idx = this._read16();
+    
+    var fieldName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
     var obj = this._stack.pop();
     this._stack.push(obj[fieldName]);    
 }
 
 
 Frame.prototype.new = function() {
-    var className = this._get(this._get(this._read16()).name_index).bytes;    
+    var idx = this._read16();
+    
+    var className = this._get(this._get(idx).name_index).bytes;    
     this._stack.push(this._api.createNewObject(className));
 }
 
 Frame.prototype.getstatic = function() {
-    var staticField = this._get(this._read16());                
-    var packageName = this._get(this._get(staticField.class_index).name_index).bytes;
-    var className = this._get(this._get(staticField.name_and_type_index).name_index).bytes;
-    this._stack.push(require(util.format("%s/%s/%s.js", __dirname, packageName, className)));    
+    var idx = this._read16();
+    
+    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
+    var staticField = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    
+    this._stack.push(this._api.getStaticField(className, staticField));    
 }
 
-
+/*
+ * @description static method
+ */
 Frame.prototype.invokestatic = function() {
-    var indx = this._read16();
-    var className = this._get(this._get(this._get(indx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
-
-    //console.log();console.log("invokestatic: " + className + "." + methodName);console.log();
+    var idx = this._read16();
     
+    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
+    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    
+
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
-        args.push(this._stack.pop());
+        args.unshift(this._stack.pop());
     }
-
-    var staticMethod = this._api.getMethod(className, methodName);
-   
-    var res;
     
-    if (staticMethod instanceof Frame) {
-        args.reverse();
-        res = staticMethod.run.apply(staticMethod, args);
+    var method = this._api.getMethod(className, methodName);
+   
+    var res = null;    
+    if (method instanceof Frame) {
+        res = method.run.apply(method, args);
     } else {
-        args.reverse();
-        res = staticMethod.apply(null, args);
+        res = method.apply(null, args);
     }
     
     if (argsType.OUT.length != 0) {                        
         this._stack.push(res);                        
     }
-
 }
 
 /*
  *@description some instance method 
  */
 Frame.prototype.invokevirtual = function() {
-    var indx = this._read16();
-    var className = this._get(this._get(this._get(indx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
-
-    //console.log();console.log("invokevirtual: " + className + "." + methodName);console.log();
+    var idx = this._read16();
+    
+    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
+    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
     
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
         args.unshift(this._stack.pop());
     }
     
-    var obj = this._stack.pop();
-    var o = this._api.createNewObject(className);
+    var instance = this._stack.pop();
+    var object = this._api.createNewObject(className);
     
-    var res;    
-    if (o[methodName] instanceof Frame) {
-        args.unshift(obj);
-        res = o[methodName].run.apply(obj[methodName], args);
+    var res = null;    
+    if (object[methodName] instanceof Frame) {
+        args.unshift(instance);
+        res = object[methodName].run.apply(instance[methodName], args);
     } else {
-        res = o[methodName].apply(obj, args);
+        res = object[methodName].apply(instance, args);
     }
         
     if (argsType.OUT.length != 0) {
@@ -746,34 +750,40 @@ Frame.prototype.invokevirtual = function() {
 }
 
 /*
- * @description ctor method runner
+ * @description ctor method
  */
 Frame.prototype.invokespecial = function() {
-    var indx = this._read16();
-    var className = this._get(this._get(this._get(indx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(indx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(indx).name_and_type_index).signature_index).bytes);
-
-    //console.log();console.log("invokespecial: " + className + "." + methodName);console.log();
+    var idx = this._read16();
+    
+    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
+    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
 
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
-        args.push(this._stack.pop());
+        args.unshift(this._stack.pop());
     }
 
-    var obj = this._stack.pop();
-    var o = this._api.createNewObject(className);
+    var instance = this._stack.pop();
+    var ctor = this._api.createNewObject(className);
     
-    if (o[methodName] instanceof Frame) {
-        args.unshift(obj);
-        o[methodName].run.apply(obj[methodName], args);
+    if (ctor[methodName] instanceof Frame) {
+        args.unshift(instance);
+        ctor[methodName].run.apply(instance[methodName], args);
     } else {        
-        o[methodName].apply(obj, args);
+        ctor[methodName].apply(instance, args);
     }
     
-    this._stack.push(obj);    
+    this._stack.push(instance);    
 }
 
 
-
+Frame.prototype.invokeinterface = function() {
+    var idx = this._read16();
+    var argsNumber = this._read8();
+    this._read8();
+    
+    throw new Error("Not implement yet.");
+    
+}
 

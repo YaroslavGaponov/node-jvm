@@ -31,6 +31,22 @@ JVM.prototype.api = function() {
     var self = this;
     
     var API = {
+        getStaticField: function(className, staticField) {
+            var classArea = self.classes[className];
+            if (!classArea) {
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                return ctor[staticField];
+            } else {
+                var fields = classArea.getFields();
+                var constantPool = classArea.getPoolConstant();
+                for(var i=0; i<fields.length; i++) {
+                    if (constantPool[fields[i].name_index].bytes === staticField) {
+                        return null
+                    }
+                }
+            }
+            throw new Error(util.format("static class %s.%s is not found", className, staticField));
+        },
         getMethod: function(className, method) {    
             var classArea = self.classes[className];
             
@@ -42,7 +58,7 @@ JVM.prototype.api = function() {
                 var constantPool = classArea.getPoolConstant();
                 for(var i=0; i<methods.length; i++) {
                     if (constantPool[methods[i].name_index].bytes === method) {
-                        return new Frame(self.api(), classArea, methods[i]);    
+                        return new Frame(API, classArea, methods[i]);    
                     }
                 }
             }
@@ -62,7 +78,7 @@ JVM.prototype.api = function() {
                 
                 classArea.getMethods().forEach(function(method) {
                     var methodName = classArea.getPoolConstant()[method.name_index].bytes;
-                    o[methodName] = new Frame(self.api(), classArea, method);
+                    o[methodName] = new Frame(API, classArea, method);
                 });
                 
                 return o;

@@ -158,8 +158,15 @@ var getClassImage = function(classBytes) {
                 break;
             case TAGS.CONSTANT_Integer:
                 var bytes = reader.read32();
-                classImage.constant_pool.push( {  tag: tag, bytes: bytes} );                                                
-                break;                
+                classImage.constant_pool.push( {  tag: tag, bytes: bytes } );                                                
+                break;
+            case TAGS.CONSTANT_Fieldref:
+            case TAGS.CONSTANT_Methodref:
+            case TAGS.CONSTANT_InterfaceMethodref:
+                var class_index = reader.read16();
+                var name_and_type_index = reader.read16();
+                classImage.constant_pool.push( {  tag: tag, class_index: class_index, name_and_type_index:name_and_type_index } );                                                
+                break;
             default:                
                 throw new Error(util.format("tag %s is not supported.", tag));
         }
