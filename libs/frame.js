@@ -506,10 +506,70 @@ Frame.prototype.pop2 = function() {
 }
 
 Frame.prototype.dup = function() {
-    var ref = this._stack.pop();
-    this._stack.push(ref);
-    this._stack.push(ref);
+    var val = this._stack.pop();
+    this._stack.push(val);
+    this._stack.push(val);
 }
+
+Frame.prototype.dup_x1 = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val1);
+    this._stack.push(val2);
+    this._stack.push(val1);
+}
+
+Frame.prototype.dup_x2 = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    var val3 = this._stack.pop();    
+    this._stack.push(val1);
+    this._stack.push(val3);
+    this._stack.push(val2);    
+    this._stack.push(val1);
+}
+
+Frame.prototype.dup2 = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2);
+    this._stack.push(val1);
+    this._stack.push(val2);
+    this._stack.push(val1);    
+}
+
+Frame.prototype.dup2_x1 = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    var val3 = this._stack.pop();
+    this._stack.push(val2);
+    this._stack.push(val1);
+    this._stack.push(val3);
+    this._stack.push(val2);
+    this._stack.push(val1);
+}
+
+Frame.prototype.dup2_x2 = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    var val3 = this._stack.pop();
+    var val4 = this._stack.pop();
+    this._stack.push(val2);
+    this._stack.push(val1);
+    this._stack.push(val4);
+    this._stack.push(val3);
+    this._stack.push(val2);
+    this._stack.push(val1);
+}
+
+
+Frame.prototype.swat = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val1);
+    this._stack.push(val2);
+}
+
 
 Frame.prototype.iinc = function() {
     this._locals[this._read8()] += this._read8();    
@@ -546,6 +606,147 @@ Frame.prototype.dsub = function() {
 Frame.prototype.fsub = function() {
     this._stack.push(- this._stack.pop() + this._stack.pop());    
 }
+
+Frame.prototype.imul = function() {
+    this._stack.push(this._stack.pop() * this._stack.pop());    
+}
+
+Frame.prototype.lmul = function() {
+    this._stack.push(this._stack.pop() * this._stack.pop());    
+}
+
+Frame.prototype.dmul = function() {
+    this._stack.push(this._stack.pop() * this._stack.pop());    
+}
+
+Frame.prototype.fmul = function() {
+    this._stack.push(this._stack.pop() * this._stack.pop());    
+}
+
+Frame.prototype.idiv = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 / val1);    
+}
+
+Frame.prototype.ldiv = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 / val1);    
+}
+
+Frame.prototype.ddiv = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 / val1);    
+}
+
+Frame.prototype.fdiv = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 / val1);    
+}
+
+Frame.prototype.irem = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 % val1);    
+}
+
+Frame.prototype.lrem = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 % val1);    
+}
+
+Frame.prototype.drem = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 % val1);    
+}
+
+Frame.prototype.frem = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 % val1);    
+}
+
+Frame.prototype.ineg = function() {
+    this._stack.push(- this._stack.pop());    
+}
+
+Frame.prototype.lneg = function() {
+    this._stack.push(- this._stack.pop());    
+}
+
+Frame.prototype.dneg = function() {
+    this._stack.push(- this._stack.pop());    
+}
+
+Frame.prototype.fneg = function() {
+    this._stack.push(- this._stack.pop());    
+}
+
+Frame.prototype.ishl = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 << val1);    
+}
+
+Frame.prototype.lshl = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 << val1);    
+}
+
+Frame.prototype.ishr = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 >> val1);    
+}
+
+Frame.prototype.lshr = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 >> val1);    
+}
+
+Frame.prototype.iushr = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 >>> val1);    
+}
+
+Frame.prototype.lushr = function() {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    this._stack.push(val2 >>> val1);    
+}
+
+Frame.prototype.iand = function() {
+    this._stack.push(this._stack.pop() & this._stack.pop());    
+}
+
+Frame.prototype.land = function() {
+    this._stack.push(this._stack.pop() & this._stack.pop());    
+}
+
+Frame.prototype.ior = function() {
+    this._stack.push(this._stack.pop() | this._stack.pop());    
+}
+
+Frame.prototype.lor = function() {
+    this._stack.push(this._stack.pop() | this._stack.pop());    
+}
+
+Frame.prototype.ixor = function() {
+    this._stack.push(this._stack.pop() ^ this._stack.pop());    
+}
+
+Frame.prototype.lxor = function() {
+    this._stack.push(this._stack.pop() ^ this._stack.pop());    
+}
+
 
 Frame.prototype.anewarray = function() {
     var type = this._read16();
