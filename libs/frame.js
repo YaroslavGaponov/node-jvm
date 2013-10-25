@@ -21,8 +21,6 @@ var Frame = module.exports = function(api, classArea, method) {
             }
         }
         
-        this._end = false;
-        
     } else {
         return new Frame(api, classArea, method);
     }
@@ -52,26 +50,35 @@ Frame.prototype._get = function(index) {
 Frame.prototype.run = function() {
     
     this._ip = 0;
-    this._locals = new Array(this._max_locals);
     this._stack = [];
-    
-    this._end = false;
-    
-    
+    this._locals = new Array(this._max_locals);
     for(var i=0; i<arguments.length; i++) {
         this._locals[i] = arguments[i];
     }    
         
-    var res = null;
-    while(!this._end) {
+    while (true) {
         var opCode = this._read8()
+        
+        switch(opCode) {
+            case Opcodes.return:
+                return;
+            case Opcodes.ireturn:
+            case Opcodes.lreturn:
+            case Opcodes.freturn:
+            case Opcodes.dreturn:
+            case Opcodes.areturn:
+                return this._stack.pop();
+        }
+
         var opName = Opcodes.toString(opCode);
+        
         if (!this[opName]) {
             throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
         }
-        res = this[opName]();        
+        
+        this[opName]();        
     }
-    return res;
+    
 };
 
 
@@ -858,36 +865,6 @@ Frame.prototype.ifnonnull = function() {
     if (!!ref) {
         this._ip += Helper.getSInt(this._read16()) - 1;
     }
-}
-
-Frame.prototype.ireturn = function() {
-    this._end = true;
-    return this._stack.pop();
-}
-
-Frame.prototype.lreturn = function() {
-    this._end = true;
-    return this._stack.pop();
-}
-
-Frame.prototype.freturn = function() {
-    this._end = true;
-    return this._stack.pop();
-}
-
-Frame.prototype.dreturn = function() {
-    this._end = true;
-    return this._stack.pop();
-}
-
-Frame.prototype.areturn = function() {
-    this._end = true;
-    return this._stack.pop();
-}
-
-Frame.prototype.return = function() {
-    this._end = true;
-    return;
 }
 
 Frame.prototype.putfield = function() {
