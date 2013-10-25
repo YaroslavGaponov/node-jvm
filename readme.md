@@ -10,19 +10,17 @@ node-jvm - jvm in pure node.js
 
 ### java
 ```java
-package examples.Fibonacci;
-
 public class Main {
 	
 	public static long fib(int n) {
             if (n <= 1) return n;
-            else return fib(n-1) + fib(n-2);
+            return fib(n-1) + fib(n-2);
         }
         
 	public static void main(String[] args) {
             if (args.length == 0) {
-                    System.out.print("help: java main {Number}");
-                    System.exit(-1);
+                    System.out.print("help: java Main.class {Number}");
+                    return;
             }		
 		
             int N = Integer.parseInt(args[0]);
@@ -32,8 +30,7 @@ public class Main {
                 System.out.println(i + ": " + fib(i));
 	    }
             long stop = System.currentTimeMillis();
-            long time = stop - start;
-            System.out.println("time: " + time + "ms");
+            System.out.println("time: " + (stop - start) + "ms");
 		
 	    System.out.println("done.");
 	}
@@ -42,14 +39,20 @@ public class Main {
 
 ### node.js
 ```javascript
-var JVM = require("../index");
+var JVM = require("../../index");
 var jvm = new JVM();
-jvm.loadClassFile("./Fibonacci/bin/examples/Fibonacci/Main.class");
+jvm.loadClassFile("./Main.class");
 jvm.run([10]);
 ```
 
-### run
-`node fibonacci.js`
+### build java files
+`cd examples fibonacci; make`
+
+### run jvm
+`./fibonacci.js`
+
+### clean
+`make clean`
 
 ### output
 ```
@@ -72,14 +75,15 @@ done.
 `cd examples/`
 
 ```
-baseobjects.js
-converter.js
-fibonacci.js
-interfaces.js
-probe.js
+cast
+dogs
+fibonacci
+idogs
+static
+switcher
 ```
 
 
-## Contributors
+## Developer
 
 Yaroslav Gaponov (yaroslav.gaponov -at - gmail.com)
