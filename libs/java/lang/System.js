@@ -21,7 +21,13 @@ System["out"] = {
     },
     "format": function(fmt, args) {
         util.print(util.format.apply(null, [fmt].concat(args)));
-    }    
+    }
 }
+
+System["currentTimeMillis"] = function() {
+    return new Date().getTime();
+}    
+
+
 
 

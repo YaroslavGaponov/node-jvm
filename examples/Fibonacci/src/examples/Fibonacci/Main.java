@@ -16,12 +16,14 @@ public class Main {
 		}		
 		
 		int N = Integer.parseInt(args[0]);
-		
+		long start = System.currentTimeMillis();		
 		System.out.format("Fibonacci from 1 to %s:\n", N);
 		for (int i = 1; i <= N; i++) {
             System.out.println(i + ": " + fib(i));
 		}
-		
+		long stop = System.currentTimeMillis();
+		long time = stop - start;
+		System.out.println("time: " + time + "ms");
 		System.out.println("done.");
 	}
 

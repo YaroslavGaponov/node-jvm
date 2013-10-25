@@ -12,7 +12,7 @@ public class Main {
 				System.out.println("11 or 12");
 				break;
 			default: 
-				System.out.print("13");
+				System.out.println("13");
 			}
 		}
 	}
