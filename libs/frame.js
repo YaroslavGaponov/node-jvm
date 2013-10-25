@@ -28,6 +28,10 @@ var Frame = module.exports = function(api, classArea, method) {
     }
 }
 
+Frame.prototype._fetch8 = function() {
+    return this._code[this._ip];
+};
+
 Frame.prototype._read8 = function() {
     return this._code[this._ip++];
 };
@@ -37,7 +41,7 @@ Frame.prototype._read16 = function() {
 };
 
 Frame.prototype._read32 = function() {
-    return this._read16()<<16 | this._read16()();
+    return this._read16()<<16 | this._read16();
 };
 
 Frame.prototype._get = function(index) {
@@ -1045,5 +1049,30 @@ Frame.prototype.jsr_w = function() {
 Frame.prototype.ret = function() {
     var idx = this._read8();
     this._ip = this._locals[idx];
+}
+
+Frame.prototype.tableswitch = function() {
+
+    var startip = this._ip;
+    var jmp;
+
+    while ((this._ip % 4) != 0) {
+        this._ip++;
+    }
+        
+    var def = this._read32();
+    var low = this._read32();
+    var high = this._read32();
+    var val = this._stack.pop();
+    
+    if (val < low || val > high) {
+        jmp = def;
+    } else {
+        this._ip  += (val - low) << 2;
+        jmp = this._read32();        
+    }    
+    
+    this._ip = startip - 1 + Helper.getSInt(jmp); 
+    
 }
 
