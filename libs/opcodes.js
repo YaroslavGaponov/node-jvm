@@ -206,8 +206,15 @@ var opcodes = module.exports = {
     "impdep1": 0xFE,
     "impdep2": 0xFF,
     toString: function(opcode) {
+        if (!this._cache) {
+            this._cache = new Array(256);
+        }        
+        if (this._cache[opcode]) {
+            return this._cache[opcode];
+        }        
         for(var op in this) {
             if (this[op] === opcode) {
+                this._cache[opcode] = op;
                 return op;
             }
         }
