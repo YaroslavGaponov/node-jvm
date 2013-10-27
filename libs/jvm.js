@@ -118,9 +118,9 @@ JVM.prototype.run = function() {
         throw new Error("Entry point method is not found.");
     }    
     
-    process.exit(
+    //process.exit(
         entryPointFrame.run(arguments)
-    );
+    //);
     
 }
 

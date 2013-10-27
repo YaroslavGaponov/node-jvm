@@ -46,6 +46,44 @@ Frame.prototype._get = function(index) {
     return this._classArea.getPoolConstant()[index];
 }
 
+Frame.prototype.runAsync = function(cb) {
+    var self = this;
+    
+    var args =  Array.prototype.slice.call(arguments).slice(1);
+
+    this._ip = 0;
+    this._stack = [];
+    this._locals = new Array(this._max_locals);
+    for(var i=0; i<args.length; i++) {
+        this._locals[i] = args[i];
+    }
+    
+    var id = setInterval(function() {
+            var opCode = self._read8()
+            
+            switch(opCode) {
+                case Opcodes.return:
+                   clearInterval(id);
+                   return cb();
+                case Opcodes.ireturn:
+                case Opcodes.lreturn:
+                case Opcodes.freturn:
+                case Opcodes.dreturn:
+                case Opcodes.areturn:
+                     clearInterval(id);
+                    return cb(self._stack.pop());
+            }
+    
+            var opName = Opcodes.toString(opCode);
+            
+            if (!self[opName]) {
+                throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
+            }
+            
+            self[opName]();
+
+    }, 0);
+}
 
 Frame.prototype.run = function() {
     
@@ -76,7 +114,7 @@ Frame.prototype.run = function() {
             throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
         }
         
-        this[opName]();        
+        this[opName]();
     }
     
 };
@@ -142,6 +180,10 @@ Frame.prototype.iconst_4 = function() {
     this._stack.push(4);    
 }
 Frame.prototype.iconst_4 = function() {
+    this._stack.push(5);    
+}
+
+Frame.prototype.iconst_5 = function() {
     this._stack.push(5);    
 }
 
