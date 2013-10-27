@@ -2,10 +2,10 @@ var util = require("util");
 var Object = require("./Object.js");
 
 var String = module.exports = function(s) {
-    if (this instanceof StringBuilder) {
+    if (this instanceof String) {
         this._str = s;
     } else {
-        return new StringBuilder(s);
+        return new String(s);
     }
 }
 

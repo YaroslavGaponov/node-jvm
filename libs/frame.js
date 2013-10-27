@@ -794,6 +794,12 @@ Frame.prototype.if_icmplt = function() {
     this._ip = this._stack.pop() > this._stack.pop() ? jmp : this._ip;    
 }
 
+Frame.prototype.if_icmpge = function() {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());                                
+    var ref1 = this._stack.pop();
+    var ref2 = this._stack.pop();
+    this._ip = ref1 <= ref2 ? jmp : this._ip;       
+}
 
 Frame.prototype.ifne = function() {
     var jmp = this._ip - 1 + Helper.getSInt(this._read16());
