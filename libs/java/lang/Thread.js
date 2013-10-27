@@ -28,17 +28,24 @@ Thread.prototype["<init>"] = function(instance) {
     return this;
 }
 
-Thread.prototype.done = function() {
-    this._state = STATE.TERMINATED;
+Thread.prototype["join"] = function() {
+    process.threads++;
 }
 
-
 Thread.prototype["start"] = function() {
+    var self = this;
     this._state = STATE.RUNNABLE;
     if (this._instance["run"] instanceof Frame) {
-        this._instance["run"].runAsync.apply(this._instance["run"], [this.done, this._instance]);
+        this._instance["run"].run.call(this._instance["run"], [this._instance], function() {
+            self._state = STATE.TERMINATED;
+            process.threads--;
+        });
     } else {
-        this._instance["run"].apply(this._instance);
+        process.nextTick(function() {
+            self._instance["run"].apply(self._instance);
+            self._state = STATE.TERMINATED;
+            process.threads--;
+        });
     }
 };
 
