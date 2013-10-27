@@ -83,6 +83,7 @@ Frame.prototype.run = function(args, done) {
             });
         });
     };
+    
     step();
 }
 
