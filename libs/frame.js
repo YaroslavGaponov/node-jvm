@@ -578,8 +578,6 @@ Frame.prototype.dastore = function(done) {
 }
 
 Frame.prototype.aastore = function(done) {
-    //console.log(this._stack.pop());
-    //this._stack.pop(); // bug
     var val = this._stack.pop();
     var idx = this._stack.pop();                
     var ref = this._stack.pop();
