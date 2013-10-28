@@ -907,9 +907,17 @@ Frame.prototype.lxor = function(done) {
 
 
 Frame.prototype.anewarray = function(done) {
-    var type = this._read16();
+    var idx = this._read16();
+    var className = this._get(this._get(idx).name_index).bytes;       
+    
     var size = this._stack.pop();
-    this._stack.push(new Array(size));
+    
+    var arr = new Array(size);
+    for(var i=0; i<size; i++) {
+        arr[i] = this._api.createNewObject(className);
+    }
+    
+    this._stack.push(arr);
     return done();
 }
 
