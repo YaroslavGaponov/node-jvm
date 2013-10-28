@@ -578,9 +578,11 @@ Frame.prototype.dastore = function(done) {
 }
 
 Frame.prototype.aastore = function(done) {
+    //console.log(this._stack.pop());
+    //this._stack.pop(); // bug
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
+    var ref = this._stack.pop();
     ref[idx] = val;
     return done();
 }
@@ -909,15 +911,8 @@ Frame.prototype.lxor = function(done) {
 Frame.prototype.anewarray = function(done) {
     var idx = this._read16();
     var className = this._get(this._get(idx).name_index).bytes;       
-    
     var size = this._stack.pop();
-    
-    var arr = new Array(size);
-    for(var i=0; i<size; i++) {
-        arr[i] = this._api.createNewObject(className);
-    }
-    
-    this._stack.push(arr);
+    this._stack.push(new Array(size));
     return done();
 }
 
@@ -1173,7 +1168,7 @@ Frame.prototype.invokespecial = function(done) {
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
     var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
-
+    
     var args = [];
     for (var i=0; i<argsType.IN.length; i++) {
         args.unshift(this._stack.pop());
@@ -1185,13 +1180,11 @@ Frame.prototype.invokespecial = function(done) {
     if (ctor[methodName] instanceof Frame) {
         args.unshift(instance);
         ctor[methodName].run.call(instance[methodName], args, function() {
-            self._stack.push(instance);
             return done();
         });
     } else {
         process.nextTick(function() {
             ctor[methodName].apply(instance, args);
-            self._stack.push(instance);
             return done();
         });
     }
