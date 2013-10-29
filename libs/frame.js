@@ -995,6 +995,29 @@ Frame.prototype.anewarray = function(done) {
     return done();
 }
 
+Frame.prototype.multianewarray = function(done) {
+    var idx = this._read16();
+    var type = this._get(this._get(idx).name_index).bytes;       
+    var dimensions = this._read8();
+    var lengths = new Array(dimensions);
+    for(var i=0; i<dimensions; i++) {
+        lengths[i] = this._stack.pop();
+    }
+    var createMultiArray = function(lengths) {
+        if (lengths.length === 0) {
+            return null;
+        }
+        var length = lengths.shift();
+        var array = new Array(length);
+        for (var i=0; i<length; i++) {
+            array[i] = createMultiArray(lengths);
+        }
+        return array;
+    };
+    this._stack.push(createMultiArray(lengths));    
+    return done();
+}
+
 Frame.prototype.arraylength = function(done) {
     var ref = this._stack.pop();
     this._stack.push(ref.length);
