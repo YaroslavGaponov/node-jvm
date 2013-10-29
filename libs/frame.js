@@ -1430,3 +1430,30 @@ Frame.prototype.tableswitch = function(done) {
     return done();
 }
 
+Frame.prototype.lookupswitch = function(done) {
+
+    var startip = this._ip;
+
+    while ((this._ip % 4) != 0) {
+        this._ip++;
+    }
+        
+    var jmp = this._read32();
+    var size = this._read32();
+    var val = this._stack.pop();
+    
+    lookup:
+        for(var i=0; i<size; i++) {
+            var key = this._read32();
+            var offset = this._read32();
+            if (key === val) {
+                jmp = offset;
+                break lookup;
+            }
+        }
+      
+    this._ip = startip - 1 + Helper.getSInt(jmp);
+    
+    return done();
+}
+
