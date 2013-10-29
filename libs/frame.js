@@ -683,7 +683,7 @@ Frame.prototype.dup2_x2 = function(done) {
 }
 
 
-Frame.prototype.swat = function(done) {
+Frame.prototype.swap = function(done) {
     var val1 = this._stack.pop();
     var val2 = this._stack.pop();
     this._stack.push(val1);

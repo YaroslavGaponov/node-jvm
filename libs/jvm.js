@@ -7,6 +7,7 @@ var path = require("path");
 var ClassArea = require("./classfile/classarea.js");
 var Frame = require("./frame.js");
 var ACCESS_FLAGS = require("./classfile/accessflags.js");
+var Opcodes = require("./opcodes.js");
 
 
 var JVM = module.exports = function(entryPoint) {
@@ -22,7 +23,7 @@ var JVM = module.exports = function(entryPoint) {
 }
 
 JVM.prototype.loadClassFile = function(classFileName) {
-    console.log("JVM: loading " + classFileName + " ...");
+    util.debug("JVM: loading " + classFileName + " ...");
     var bytes = fs.readFileSync(classFileName);
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;        
@@ -135,6 +136,17 @@ JVM.prototype.run = function() {
     if (!entryPointFrame) {
         throw new Error("Entry point method is not found.");
     }
+    
+    var notSupportOpcode = [];
+    for (var opcode in Opcodes) {
+        if (!entryPointFrame[opcode]) {
+            if (["return", "ireturn", "lreturn", "dreturn", "freturn", "areturn"].indexOf(opcode) === -1) {
+                notSupportOpcode.push(opcode);
+            }
+        }
+    }
+    util.debug("Not support opcodes: " + notSupportOpcode.join(","));
+    
     
     process.JVM = {
         threads: 0
