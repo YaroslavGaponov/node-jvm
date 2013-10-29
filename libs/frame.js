@@ -905,6 +905,13 @@ Frame.prototype.lxor = function(done) {
     return done();
 }
 
+Frame.prototype.newarray = function(done) {
+    var type = this._read8();  
+    var size = this._stack.pop();
+    this._stack.push(new Array(size));    
+    return done();    
+}
+
 
 Frame.prototype.anewarray = function(done) {
     var idx = this._read16();
