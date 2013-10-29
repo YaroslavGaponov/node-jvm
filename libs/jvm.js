@@ -145,7 +145,9 @@ JVM.prototype.run = function() {
             }
         }
     }
-    util.debug("Not support opcodes: " + notSupportOpcode.join(","));
+    if (notSupportOpcode.length > 0) {
+        util.debug("Not support opcodes: " + notSupportOpcode.join(","));
+    }
     
     
     process.JVM = {

@@ -186,7 +186,6 @@ var opcodes = module.exports = {
     "invokespecial": 0xB7,
     "invokestatic": 0xB8,
     "invokeinterface": 0xB9,
-    "unused": 0xBA,
     "new": 0xBB,
     "newarray": 0xBC,
     "anewarray": 0xBD,
@@ -202,9 +201,6 @@ var opcodes = module.exports = {
     "ifnonnull": 0xC7,
     "goto_w": 0xC8,
     "jsr_w": 0xC9,
-    "breakpoint": 0xCA,
-    "impdep1": 0xFE,
-    "impdep2": 0xFF,
     toString: function(opcode) {
         if (!this._cache) {
             this._cache = new Array(256);

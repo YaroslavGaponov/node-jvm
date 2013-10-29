@@ -905,6 +905,80 @@ Frame.prototype.lxor = function(done) {
     return done();
 }
 
+Frame.prototype.lcmp = function(done) {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    if (val2 > val1) {
+        this._stack.push(1);
+    } else if (val2 < val1) {
+        this._stack.push(-1);
+    } else {
+        this._stack.push(0);
+    }
+    return done();
+}
+
+Frame.prototype.fcmpl = function(done) {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    if (isNaN(val1) || isNaN(val2)) {
+        this._stack.push(-1);
+    } else if (val2 > val1) {
+        this._stack.push(1);
+    } else if (val2 < val1) {
+        this._stack.push(-1);
+    } else {
+        this._stack.push(0);
+    }    
+    return done;
+}
+
+Frame.prototype.fcmpg = function(done) {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    if (isNaN(val1) || isNaN(val2)) {
+        this._stack.push(1);
+    } else if (val2 > val1) {
+        this._stack.push(1);
+    } else if (val2 < val1) {
+        this._stack.push(-1);
+    } else {
+        this._stack.push(0);
+    }    
+    return done;
+}
+
+Frame.prototype.dcmpl = function(done) {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    if (isNaN(val1) || isNaN(val2)) {
+        this._stack.push(-1);
+    } else if (val2 > val1) {
+        this._stack.push(1);
+    } else if (val2 < val1) {
+        this._stack.push(-1);
+    } else {
+        this._stack.push(0);
+    }    
+    return done;
+}
+
+Frame.prototype.dcmpg = function(done) {
+    var val1 = this._stack.pop();
+    var val2 = this._stack.pop();
+    if (isNaN(val1) || isNaN(val2)) {
+        this._stack.push(1);
+    } else if (val2 > val1) {
+        this._stack.push(1);
+    } else if (val2 < val1) {
+        this._stack.push(-1);
+    } else {
+        this._stack.push(0);
+    }    
+    return done;
+}
+
+
 Frame.prototype.newarray = function(done) {
     var type = this._read8();  
     var size = this._stack.pop();
