@@ -160,7 +160,7 @@ var opcodes = module.exports = {
     "ifgt": 0x9D,
     "ifle": 0x9E,
     "if_icmpeq": 0x9F,
-    "if_acmpne": 0xA0,
+    "if_icmpne": 0xA0,
     "if_icmplt": 0xA1,
     "if_icmpge": 0xA2,
     "if_icmpgt": 0xA3,

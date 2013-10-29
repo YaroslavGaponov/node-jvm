@@ -1009,6 +1009,14 @@ Frame.prototype.if_icmpeq = function(done) {
     return done();
 }
 
+Frame.prototype.if_icmpne = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());                                
+    var ref1 = this._stack.pop();
+    var ref2 = this._stack.pop();
+    this._ip = ref1 !== ref2 ? jmp : this._ip;
+    return done();
+}
+
 Frame.prototype.if_icmpgt = function(done) {
     var jmp = this._ip - 1 + Helper.getSInt(this._read16());                                
     var ref1 = this._stack.pop();
@@ -1034,6 +1042,22 @@ Frame.prototype.if_icmpge = function(done) {
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 <= ref2 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.if_acmpeq = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());                                
+    var ref1 = this._stack.pop();
+    var ref2 = this._stack.pop();
+    this._ip = ref1 === ref2 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.if_acmpne = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());                                
+    var ref1 = this._stack.pop();
+    var ref2 = this._stack.pop();
+    this._ip = ref1 !== ref2 ? jmp : this._ip;
     return done();
 }
 
