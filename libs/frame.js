@@ -1448,7 +1448,9 @@ Frame.prototype.lookupswitch = function(done) {
             var offset = this._read32();
             if (key === val) {
                 jmp = offset;
-                break lookup;
+            }
+            if (key >= val) {
+                break lookup;    
             }
         }
       
