@@ -1027,7 +1027,7 @@ Frame.prototype.goto = function(done) {
     return done();
 }
 
-Frame.prototype.goto_W = function(done) {
+Frame.prototype.goto_w = function(done) {
     this._ip += Helper.getSInt(this._read32()) - 1;
     return done();
 }
