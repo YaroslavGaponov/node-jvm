@@ -969,6 +969,36 @@ Frame.prototype.ifne = function(done) {
     return done();
 }
 
+Frame.prototype.ifeq = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());
+    this._ip = this._stack.pop() === 0 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.iflt = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());
+    this._ip = this._stack.pop() < 0 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.ifge = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());
+    this._ip = this._stack.pop() >= 0 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.ifgt = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());
+    this._ip = this._stack.pop() > 0 ? jmp : this._ip;
+    return done();
+}
+
+Frame.prototype.ifle = function(done) {
+    var jmp = this._ip - 1 + Helper.getSInt(this._read16());
+    this._ip = this._stack.pop() <= 0 ? jmp : this._ip;
+    return done();
+}
+
 Frame.prototype.i2l = function(done) {
     return done();
 }
