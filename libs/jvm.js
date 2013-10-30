@@ -82,6 +82,23 @@ JVM.prototype.api = function() {
                 }
             }
         },
+        getMethod: function(className, methodName) {            
+            var classArea = self.classes[className];
+            
+            if (!classArea) {
+                var ctor = require(util.format("%s/%s.js", __dirname, className));
+                var o = new ctor(); 
+                return o[methodName];
+            } else {            
+                var methods = classArea.getMethods();
+                var constantPool = classArea.getPoolConstant();
+                for(var i=0; i<methods.length; i++) {
+                    if (constantPool[methods[i].name_index].bytes === methodName) {
+                        return new Frame(API, classArea, methods[i]);    
+                    }
+                }
+            }            
+        },
         createNewObject: function(className) {
             var classArea = self.classes[className];
             
@@ -90,6 +107,7 @@ JVM.prototype.api = function() {
                 return new ctor();
             } else {
                 var o = Object.create(API.createNewObject(classArea.getSuperClassName()));
+                o.__className = className;
                 
                 classArea.getFields().forEach(function(field) {
                     o[classArea.getPoolConstant()[field.name_index].bytes] = null;

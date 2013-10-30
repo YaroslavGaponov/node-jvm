@@ -77,7 +77,7 @@ Frame.prototype.run = function(args, done) {
             if (!self[opName]) {
                 throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
             }
-            
+
             self[opName](function() {
                 return step();
             });
@@ -1262,20 +1262,18 @@ Frame.prototype.invokestatic = function(done) {
     var method = this._api.getStaticMethod(className, methodName);
     
     if (method instanceof Frame) {
-        method.run.call(method, args, function(res) {
+        method.run(args, function(res) {
             if (argsType.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();
         });
     } else {
-        process.nextTick(function() {
-            var res = method.apply(null, args);
-            if (argsType.OUT.length != 0) {                        
-                self._stack.push(res);                        
-            }
-            return done();
-        });
+        var res = method.apply(null, args);
+        if (argsType.OUT.length != 0) {                        
+            self._stack.push(res);                        
+        }
+        return done();
     }
 }    
 
@@ -1295,24 +1293,22 @@ Frame.prototype.invokevirtual = function(done) {
     }
     
     var instance = this._stack.pop();
-    var object = this._api.createNewObject(className);
+    var method = this._api.getMethod(className, methodName);
       
-    if (object[methodName] instanceof Frame) {
+    if (method instanceof Frame) {
         args.unshift(instance);
-        object[methodName].run.call(instance[methodName], args, function(res) {
+        method.run(args, function(res) {
             if (argsType.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();            
         });
     } else {
-        process.nextTick(function() {
-            var res = object[methodName].apply(instance, args);        
-            if (argsType.OUT.length != 0) {
-                self._stack.push(res);
-            }
-            return done();
-        });
+        var res = method.apply(instance, args);        
+        if (argsType.OUT.length != 0) {
+            self._stack.push(res);
+        }
+        return done();
     }
 }
 
@@ -1331,18 +1327,16 @@ Frame.prototype.invokespecial = function(done) {
     }
 
     var instance = this._stack.pop();
-    var ctor = this._api.createNewObject(className);
+    var ctor = this._api.getMethod(className, methodName);
     
-    if (ctor[methodName] instanceof Frame) {
+    if (ctor instanceof Frame) {
         args.unshift(instance);
-        ctor[methodName].run.call(instance[methodName], args, function() {
+        ctor.run(args, function() {
             return done();
         });
     } else {
-        process.nextTick(function() {
-            ctor[methodName].apply(instance, args);
-            return done();
-        });
+        ctor.apply(instance, args);
+        return done();
     }
     
 }
@@ -1367,20 +1361,18 @@ Frame.prototype.invokeinterface = function(done) {
       
     if (instance[methodName] instanceof Frame) {
         args.unshift(instance);
-        instance[methodName].run.call(instance[methodName], args, function(res) {
+        instance[methodName].run(args, function(res) {
             if (argsType.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();            
         });
     } else {
-        process.nextTick(function() {
-            var res = instance[methodName].apply(instance, args);
-            if (argsType.OUT.length != 0) {
-                self._stack.push(res);
-            }
-            return done();
-        });
+        var res = instance[methodName].apply(instance, args);
+        if (argsType.OUT.length != 0) {
+            self._stack.push(res);
+        }
+        return done();
     }
 }
 
@@ -1459,3 +1451,14 @@ Frame.prototype.lookupswitch = function(done) {
     return done();
 }
 
+Frame.prototype.instanceof = function(done) {
+    var idx = this._read16();
+    var className = this._get(this._get(idx).name_index).bytes;
+    var obj = this._stack.pop();
+    if (obj.__className === className) {
+        this._stack.push(1);
+    } else {
+        this._stack.push(0);
+    }
+    return done();
+}
