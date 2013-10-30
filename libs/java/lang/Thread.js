@@ -43,20 +43,18 @@ Thread.prototype["start"] = function() {
     var self = this;
     this._state = STATE.RUNNABLE;
     if (this._instance["run"] instanceof Frame) {
-        this._instance["run"].run.call(this._instance["run"], [this._instance], function() {
+        this._instance["run"].run([this._instance], function() {
             self._state = STATE.TERMINATED;
             if (self._join) {
                 process.JVM.threads--;
             }
         });
     } else {
-        process.nextTick(function() {
-            self._instance["run"].apply(self._instance);
-            self._state = STATE.TERMINATED;
-            if (self._join) {
-                process.JVM.threads--;
-            }
-        });
+        self._instance["run"]();
+        self._state = STATE.TERMINATED;
+        if (self._join) {
+            process.JVM.threads--;
+        }
     }
 };
 

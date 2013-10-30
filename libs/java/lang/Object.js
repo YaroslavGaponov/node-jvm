@@ -7,7 +7,6 @@ var util = require("util");
 
 var Object = module.exports = function() {
     if (this instanceof Object) {
-        this.__className = "java.lang.Object";
         this._hashCode = null;
     } else {
         return new Object();

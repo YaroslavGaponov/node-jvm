@@ -20,7 +20,7 @@
     "machine"
   ],
   "author": "Yaroslav Gaponov",
-  "license": "BSD",
+  "license": "MIT",
   "readmeFilename": "readme.md",
   "gitHead": "83c5cb707556be23a180c7bd62c6f20ad65b979a",
   "bugs": {

@@ -111,7 +111,7 @@ JVM.prototype.api = function() {
                 return new ctor();
             } else {
                 var o = Object.create(API.createNewObject(classArea.getSuperClassName()));
-                o.__className = className;
+                o._className = className;
                 
                 classArea.getFields().forEach(function(field) {
                     o[classArea.getPoolConstant()[field.name_index].bytes] = null;
@@ -178,7 +178,7 @@ JVM.prototype.run = function() {
     
     entryPointFrame.run(arguments, function(code) {
         var halt = function() {
-            process.nextTick(function() {
+            setImmediate(function() {
                 if (process.JVM.threads === 0) {
                     process.exit(code);
                 } else {

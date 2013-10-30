@@ -1459,7 +1459,7 @@ Frame.prototype.instanceof = function(done) {
     var idx = this._read16();
     var className = this._get(this._get(idx).name_index).bytes;
     var obj = this._stack.pop();
-    if (obj.__className === className) {
+    if (obj._className === className) {
         this._stack.push(true);
     } else {
         this._stack.push(false);
