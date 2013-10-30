@@ -1,4 +1,3 @@
-
 public class Main {
 
 	public static void main(String[] args) {
@@ -7,12 +6,12 @@ public class Main {
 		long l = i;
 		float f = l;
 		double d = f;
-		
+
 		System.out.println(b);
 		System.out.println(i);
 		System.out.println(l);
 		System.out.println(f);
-		System.out.println(d);		
+		System.out.println(d);
 	}
 
 }

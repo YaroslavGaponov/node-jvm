@@ -6,7 +6,7 @@ public class Main {
 
 		mike.say("hello");
 		sten.say("woof");
-		
+
 	}
 
 }
