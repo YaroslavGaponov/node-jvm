@@ -62,7 +62,7 @@ Frame.prototype.run = function(args, done) {
     }
     
     var step = function() {
-        process.nextTick(function() {
+        setImmediate(function() {
             var opCode = self._read8()
             
             switch(opCode) {
