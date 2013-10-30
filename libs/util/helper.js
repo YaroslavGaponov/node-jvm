@@ -1,3 +1,7 @@
+/*
+ node-jvm
+ Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
+*/
 
 module.exports.getSByte = function(v) {
     n = parseInt(v, 10) & 255;

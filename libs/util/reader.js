@@ -1,3 +1,7 @@
+/*
+ node-jvm
+ Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
+*/
 
 var Reader = function(bytes, offset) {
     if (this instanceof Reader) {

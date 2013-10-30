@@ -1,5 +1,9 @@
+/*
+ node-jvm
+ Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
+*/
 
-VAR ARRAY_TYPE = module.exports = {
+var ARRAY_TYPE = module.exports = {
     T_BOOLEAN: 4,
     T_CHAR: 5,
     T_FLOAT: 6,

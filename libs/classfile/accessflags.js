@@ -1,3 +1,7 @@
+/*
+ node-jvm
+ Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
+*/
 
 var ACCESS_FLAGS = module.exports = {
     ACC_PUBLIC: 0x0001,
