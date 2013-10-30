@@ -1259,7 +1259,7 @@ Frame.prototype.invokestatic = function(done) {
         args.unshift(this._stack.pop());
     }
     
-    var method = this._api.getMethod(className, methodName);
+    var method = this._api.getStaticMethod(className, methodName);
     
     if (method instanceof Frame) {
         method.run.call(method, args, function(res) {

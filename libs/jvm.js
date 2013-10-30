@@ -66,12 +66,12 @@ JVM.prototype.api = function() {
             }
             throw new Error(util.format("static class %s.%s is not found", className, staticField));
         },
-        getMethod: function(className, method) {    
+        getStaticMethod: function(className, method) {    
             var classArea = self.classes[className];
             
             if (!classArea) {
                 var ctor = require(util.format("%s/%s.js", __dirname, className));
-                return method === "<init>" ? ctor : ctor[method];
+                return ctor[method];
             } else {            
                 var methods = classArea.getMethods();
                 var constantPool = classArea.getPoolConstant();
@@ -89,7 +89,7 @@ JVM.prototype.api = function() {
                 var ctor = require(util.format("%s/%s.js", __dirname, className));
                 return new ctor();
             } else {
-                var o = {};
+                var o = Object.create(API.createNewObject(classArea.getSuperClassName()));
                 
                 classArea.getFields().forEach(function(field) {
                     o[classArea.getPoolConstant()[field.name_index].bytes] = null;

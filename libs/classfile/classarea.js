@@ -18,6 +18,9 @@ ClassArea.prototype.getClassName = function() {
     return this.classImage.constant_pool[this.classImage.constant_pool[this.classImage.this_class].name_index].bytes;    
 }
 
+ClassArea.prototype.getSuperClassName = function() {    
+    return this.classImage.constant_pool[this.classImage.constant_pool[this.classImage.super_class].name_index].bytes;    
+}
 
 ClassArea.prototype.getAccessFlags = function() {
     return this.classImage.access_flags;    
