@@ -164,7 +164,7 @@ JVM.prototype.run = function() {
         }
     }
     if (notSupportOpcode.length > 0) {
-        util.debug("Not support opcodes: " + notSupportOpcode.join(","));
+        util.debug("Not support opcodes: " + notSupportOpcode.toString());
     }
     
     

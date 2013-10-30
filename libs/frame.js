@@ -1456,9 +1456,9 @@ Frame.prototype.instanceof = function(done) {
     var className = this._get(this._get(idx).name_index).bytes;
     var obj = this._stack.pop();
     if (obj.__className === className) {
-        this._stack.push(1);
+        this._stack.push(true);
     } else {
-        this._stack.push(0);
+        this._stack.push(false);
     }
     return done();
 }

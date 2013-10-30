@@ -3,7 +3,7 @@ var util = require("util");
 
 var Object = module.exports = function() {
     if (this instanceof Object) {
-        this._className = "java.lang.Object";
+        this.__className = "java.lang.Object";
         this._hashCode = null;
     } else {
         return new Object();
@@ -15,7 +15,7 @@ Object.prototype["<init>"] = function() {
 }
 
 Object.prototype["toString"] = function() {
-    return util.format("%s@%s", this._className, this.hashCode());
+    return util.format("%s@%s", this.__className, this.hashCode());
 }
 
 Object.prototype["hashCode"] = function() {
