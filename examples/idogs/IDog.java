@@ -1,4 +1,3 @@
-
 public interface IDog {
-	void say(String message); 
+	void say(String message);
 }
