@@ -94,7 +94,8 @@ JVM.prototype.api = function() {
                     if (constantPool[methods[i].name_index].bytes === methodName) {
                         return new Frame(API, clazz, methods[i]);    
                     }
-                }                
+                }
+                throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
             } else {
                 return clazz[methodName];
             }
@@ -109,6 +110,7 @@ JVM.prototype.api = function() {
                         return new Frame(API, clazz, methods[i]);    
                     }
                 }
+                throw new Error(util.format("Method %s.%s is not found.", className, methodName));
             } else {
                 var o = new clazz();
                 return o[methodName];
