@@ -25,7 +25,7 @@ class Cat extends Animal {
 public class Main {
 
 	public static void main(String[] args) {
-		Animal mike = new Dog("Mike");
+		Animal mike = new Dog("Mike");		
 		Animal sten = new Dog("Sten");
 		System.out.println("mike is instanceOf Dog: " + (mike instanceof Dog));
 		System.out.println("sten is instanceOf Dog: " + (sten instanceof Dog));

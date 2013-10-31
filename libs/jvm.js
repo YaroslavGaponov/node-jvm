@@ -30,7 +30,8 @@ JVM.prototype.loadClassFile = function(classFileName) {
     util.debug("JVM: loading " + classFileName + " ...");
     var bytes = fs.readFileSync(classFileName);
     var classArea = new ClassArea(bytes);
-    this.classes[classArea.getClassName()] = classArea;        
+    this.classes[classArea.getClassName()] = classArea;
+    return classArea;
 }
 
 JVM.prototype.loadClassFiles = function(dirName) {
@@ -54,76 +55,83 @@ JVM.prototype.api = function() {
     var self = this;
     
     var API = {
-        getStaticField: function(className, staticField) {
+        getClass: function(className) {
             var classArea = self.classes[className];
             if (!classArea) {
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                return ctor[staticField];
+                var fileNameBase = util.format("%s/%s", __dirname, className);
+                if (fs.existsSync(fileNameBase + ".js")) {
+                    return require(fileNameBase + ".js");
+                } else if(fs.existsSync(fileNameBase + ".class")) {
+                    return self.loadClassFile(fileNameBase + ".class");
+                } else {
+                    throw new Error(util.format("Implementation of the % class is not found.", className));
+                }
             } else {
-                var fields = classArea.getFields();
-                var constantPool = classArea.getPoolConstant();
+                return classArea;
+            }
+        },
+        getStaticField: function(className, staticField) {
+            var clazz = API.getClass(className);
+            if (clazz instanceof ClassArea) {
+                var fields = clazz.getFields();
+                var constantPool = clazz.getPoolConstant();
                 for(var i=0; i<fields.length; i++) {
                     if (constantPool[fields[i].name_index].bytes === staticField) {
                         return null
                     }
-                }
-            }
-            throw new Error(util.format("static class %s.%s is not found", className, staticField));
-        },
-        getStaticMethod: function(className, method) {    
-            var classArea = self.classes[className];
-            
-            if (!classArea) {
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                return ctor[method];
-            } else {            
-                var methods = classArea.getMethods();
-                var constantPool = classArea.getPoolConstant();
-                for(var i=0; i<methods.length; i++) {
-                    if (constantPool[methods[i].name_index].bytes === method) {
-                        return new Frame(API, classArea, methods[i]);    
-                    }
-                }
+                }                
+            } else {
+                return clazz[staticField];
             }
         },
-        getMethod: function(className, methodName) {            
-            var classArea = self.classes[className];
-            
-            if (!classArea) {
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                var o = new ctor(); 
-                return o[methodName];
-            } else {            
-                var methods = classArea.getMethods();
-                var constantPool = classArea.getPoolConstant();
+        getStaticMethod: function(className, methodName) {
+            var clazz = API.getClass(className);  
+            if(clazz instanceof ClassArea) {
+                var methods = clazz.getMethods();
+                var constantPool = clazz.getPoolConstant();
                 for(var i=0; i<methods.length; i++) {
                     if (constantPool[methods[i].name_index].bytes === methodName) {
-                        return new Frame(API, classArea, methods[i]);    
+                        return new Frame(API, clazz, methods[i]);    
+                    }
+                }                
+            } else {
+                return clazz[methodName];
+            }
+        },
+        getMethod: function(className, methodName) {
+            var clazz = API.getClass(className);
+            if (clazz instanceof ClassArea) {
+                var methods = clazz.getMethods();
+                var constantPool = clazz.getPoolConstant();
+                for(var i=0; i<methods.length; i++) {
+                    if (constantPool[methods[i].name_index].bytes === methodName) {
+                        return new Frame(API, clazz, methods[i]);    
                     }
                 }
-            }            
+            } else {
+                var o = new clazz();
+                return o[methodName];
+            }
         },
         createNewObject: function(className) {
-            var classArea = self.classes[className];
-            
-            if (!classArea) {
-                var ctor = require(util.format("%s/%s.js", __dirname, className));
-                return new ctor();
-            } else {
-                var o = Object.create(API.createNewObject(classArea.getSuperClassName()));
+            var clazz = API.getClass(className);
+            if (clazz instanceof ClassArea) {
+                var o = Object.create(API.createNewObject(clazz.getSuperClassName()));
                 o._className = className;
                 
-                classArea.getFields().forEach(function(field) {
-                    o[classArea.getPoolConstant()[field.name_index].bytes] = null;
+                clazz.getFields().forEach(function(field) {
+                    o[clazz.getPoolConstant()[field.name_index].bytes] = null;
                 });
                 
-                classArea.getMethods().forEach(function(method) {
-                    var methodName = classArea.getPoolConstant()[method.name_index].bytes;
-                    o[methodName] = new Frame(API, classArea, method);
+                clazz.getMethods().forEach(function(method) {
+                    var methodName = clazz.getPoolConstant()[method.name_index].bytes;
+                    o[methodName] = new Frame(API, clazz, method);
                 });
                 
                 return o;
-            }            
+            } else {
+                return new clazz();
+            }
         }
     };
     
