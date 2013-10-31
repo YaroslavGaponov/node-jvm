@@ -79,7 +79,8 @@ JVM.prototype.api = function() {
                     if (constantPool[fields[i].name_index].bytes === staticField) {
                         return null
                     }
-                }                
+                }
+                throw new Error(util.format("Static field %s.%s is not found.", className, staticField));
             } else {
                 return clazz[staticField];
             }
