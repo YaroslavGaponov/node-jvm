@@ -209,13 +209,12 @@ var opcodes = module.exports = {
         if (!this._cache) {
             this._cache = new Array(256);
         }        
-        if (this._cache[opcode]) {
+        if (opcode in this._cache) {
             return this._cache[opcode];
         }        
         for(var op in this) {
             if (this[op] === opcode) {
-                this._cache[opcode] = op;
-                return op;
+                return this._cache[opcode] = op;
             }
         }
         return null;
