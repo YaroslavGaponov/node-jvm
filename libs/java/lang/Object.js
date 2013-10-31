@@ -13,6 +13,11 @@ var Object = module.exports = function() {
     }
 }
 
+Object.getClassName = function() {
+    return "java/lang/Object";
+}
+ 
+
 Object.prototype["<init>"] = function() {
     return this;
 }

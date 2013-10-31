@@ -12,7 +12,10 @@ var out = module.exports = function() {
     }
 };
 
-    
+out.getClassName = function() {
+    return "java/io/PrintStream";
+}
+ 
 out.prototype["print"] = function() {
     util.print.apply(null, arguments);
 };

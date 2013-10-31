@@ -20,6 +20,11 @@ var StringBuilder = module.exports = function(p) {
 
 util.inherits(StringBuilder, Object);
 
+StringBuilder.getClassName = function() {
+    return "java/lang/StringBuilder";
+}
+ 
+
 StringBuilder.prototype["<init>"] = function() {
     for(var i=0; i<arguments.length; i++) {
         this._buf += arguments[i].toString();

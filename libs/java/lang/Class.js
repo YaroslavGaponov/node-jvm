@@ -8,11 +8,15 @@ var Clazz = module.exports = function(className, clazz) {
     }
 }
 
-Clazz["forName"] = function(className) {
-    return new Clazz(className, process.API.getClass(className));
+Clazz.getClassName = function() {
+    return "java/lang/Class";
+}
+ 
+Clazz.forName = function(className) {
+    return new Clazz(className, process.JVM.Loader.getClass(className));
 }
 
 Clazz.prototype.newInstance = function() {
-    return process.API.createNewObject(this._className);
+    return process.JVM.Loader.createNewObject(this._className);
 
 }

@@ -10,11 +10,15 @@ var Integer = module.exports = function() {
     }
 }
 
-Integer["parseInt"] = function() {
+Integer.getClassName = function() {
+    return "java/lang/Integer";
+}
+ 
+Integer.parseInt = function() {
     return parseInt.apply(null, arguments);
 }
 
-Integer["valueOf"] = function() {
+Integer.valueOf = function() {
     if (arguments.length === 0) return "0";
     return arguments[0].toString();
 }

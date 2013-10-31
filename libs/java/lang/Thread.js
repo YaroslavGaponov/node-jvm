@@ -27,6 +27,11 @@ var Thread = module.exports = function() {
 
 util.inherits(String, Object);
 
+
+Thread.getClassName = function() {
+    return "java/lang/Thread";
+}
+ 
 Thread.prototype["<init>"] = function(instance) {
     this._instance = instance;
     this._state = STATE.NEW;
@@ -36,7 +41,7 @@ Thread.prototype["<init>"] = function(instance) {
 
 Thread.prototype["join"] = function() {
     this._join = true;
-    process.JVM.threads++;
+    process.JVM.Threads++;
 }
 
 Thread.prototype["start"] = function() {
@@ -46,14 +51,14 @@ Thread.prototype["start"] = function() {
         this._instance["run"].run([this._instance], function() {
             self._state = STATE.TERMINATED;
             if (self._join) {
-                process.JVM.threads--;
+                process.JVM.Threads--;
             }
         });
     } else {
         self._instance["run"]();
         self._state = STATE.TERMINATED;
         if (self._join) {
-            process.JVM.threads--;
+            process.JVM.Threads--;
         }
     }
 };

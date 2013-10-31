@@ -7,31 +7,23 @@ var util = require("util");
 var fs = require("fs");
 var path = require("path");
 
-
-var ClassArea = require("./classfile/classarea.js");
-var Frame = require("./frame.js");
-var ACCESS_FLAGS = require("./classfile/accessflags.js");
 var Opcodes = require("./opcodes.js");
+var Loader = require("./loader.js");
 
 
-var JVM = module.exports = function(entryPoint) {
+var JVM = module.exports = function() {
     if (this instanceof JVM) {
-        this.classes = {};
-        this.entryPoint = {
-            className: entryPoint ? entryPoint.className || null : null,
-            methodName: entryPoint ? entryPoint.methodName || "main" : "main"
-        };
+        process.JVM = {
+            Loader: new Loader(),
+            Threads: 1
+        }
     } else {
-        return new JVM(entryPoint);
+        return new JVM();
     }
 }
 
-JVM.prototype.loadClassFile = function(classFileName) {
-    util.debug("JVM: loading " + classFileName + " ...");
-    var bytes = fs.readFileSync(classFileName);
-    var classArea = new ClassArea(bytes);
-    this.classes[classArea.getClassName()] = classArea;
-    return classArea;
+JVM.prototype.loadClassFile = function(fileName) {
+    return process.JVM.Loader.loadClassFile(fileName);
 }
 
 JVM.prototype.loadClassFiles = function(dirName) {
@@ -50,123 +42,13 @@ JVM.prototype.loadClassFiles = function(dirName) {
     });
 }
 
-
-JVM.prototype.api = function() {
-    var self = this;
-    
-    var API = {
-        getClass: function(className) {
-            var classArea = self.classes[className];
-            if (!classArea) {
-                var fileNameBase = util.format("%s/%s", __dirname, className);
-                if (fs.existsSync(fileNameBase + ".js")) {
-                    return require(fileNameBase + ".js");
-                } else if(fs.existsSync(fileNameBase + ".class")) {
-                    return self.loadClassFile(fileNameBase + ".class");
-                } else {
-                    throw new Error(util.format("Implementation of the %s class is not found.", className));
-                }
-            } else {
-                return classArea;
-            }
-        },
-        getStaticField: function(className, staticField) {
-            var clazz = API.getClass(className);
-            if (clazz instanceof ClassArea) {
-                var fields = clazz.getFields();
-                var constantPool = clazz.getPoolConstant();
-                for(var i=0; i<fields.length; i++) {
-                    if (constantPool[fields[i].name_index].bytes === staticField) {
-                        return null
-                    }
-                }
-                throw new Error(util.format("Static field %s.%s is not found.", className, staticField));
-            } else {
-                return clazz[staticField];
-            }
-        },
-        getStaticMethod: function(className, methodName) {
-            var clazz = API.getClass(className);  
-            if(clazz instanceof ClassArea) {
-                var methods = clazz.getMethods();
-                var constantPool = clazz.getPoolConstant();
-                for(var i=0; i<methods.length; i++) {
-                    if (constantPool[methods[i].name_index].bytes === methodName) {
-                        return new Frame(API, clazz, methods[i]);    
-                    }
-                }
-                throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
-            } else {
-                return clazz[methodName];
-            }
-        },
-        getMethod: function(className, methodName) {
-            var clazz = API.getClass(className);
-            if (clazz instanceof ClassArea) {
-                var methods = clazz.getMethods();
-                var constantPool = clazz.getPoolConstant();
-                for(var i=0; i<methods.length; i++) {
-                    if (constantPool[methods[i].name_index].bytes === methodName) {
-                        return new Frame(API, clazz, methods[i]);    
-                    }
-                }
-                throw new Error(util.format("Method %s.%s is not found.", className, methodName));
-            } else {
-                var o = new clazz();
-                return o[methodName];
-            }
-        },
-        createNewObject: function(className) {
-            var clazz = API.getClass(className);
-            if (clazz instanceof ClassArea) {
-                var o = Object.create(API.createNewObject(clazz.getSuperClassName()));
-                o._className = className;
-                
-                clazz.getFields().forEach(function(field) {
-                    o[clazz.getPoolConstant()[field.name_index].bytes] = null;
-                });
-                
-                clazz.getMethods().forEach(function(method) {
-                    var methodName = clazz.getPoolConstant()[method.name_index].bytes;
-                    o[methodName] = new Frame(API, clazz, method);
-                });
-                
-                return o;
-            } else {
-                return new clazz();
-            }
-        }
-    };
-    
-    process.API = API;
-    
-    return API;
+JVM.prototype.loadJSFile = function(fileName) {
+    return process.JVM.Loader.loadJSFile(fileName);
 }
 
 
 JVM.prototype.run = function() {
-    var entryPointFrame = null;
-
-    for(var className in this.classes) {
-        var classArea = this.classes[className];
-        if (!this.entryPoint.className || (this.entryPoint.className === classArea.getClassName())) {    
-            if ((classArea.getAccessFlags() & ACCESS_FLAGS.ACC_PUBLIC) !== 0) {
-                var methods = classArea.getMethods();
-                var constantPool = classArea.getPoolConstant();
-                for(var i=0; i<methods.length; i++) {
-                    if
-                    (
-                        ((methods[i].access_flags & ACCESS_FLAGS.ACC_PUBLIC) !== 0) &&
-                        ((methods[i].access_flags & ACCESS_FLAGS.ACC_STATIC) !== 0) &&
-                        (constantPool[methods[i].name_index].bytes === this.entryPoint.methodName)
-                    )
-                    {
-                        entryPointFrame = new Frame(this.api(), classArea, methods[i]);    
-                    }
-                }
-            }
-        }
-    }
+    var entryPointFrame = process.JVM.Loader.getEntryPointFrame();
     
     if (!entryPointFrame) {
         throw new Error("Entry point method is not found.");
@@ -185,14 +67,10 @@ JVM.prototype.run = function() {
     }
     
     
-    process.JVM = {
-        threads: 0
-    };
-    
     entryPointFrame.run(arguments, function(code) {
         var halt = function() {
             setImmediate(function() {
-                if (process.JVM.threads === 0) {
+                if (process.JVM.Threads === 1) {
                     process.exit(code);
                 } else {
                     halt();

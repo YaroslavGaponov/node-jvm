@@ -12,6 +12,11 @@ var System = module.exports = function() {
     }
 }
 
+System.getClassName = function() {
+    return "java/lang/System";
+}
+ 
+
 System["exit"] = function() {
     process.exit();
 }

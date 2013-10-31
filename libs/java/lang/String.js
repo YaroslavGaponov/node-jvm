@@ -16,6 +16,10 @@ var String = module.exports = function(s) {
 
 util.inherits(String, Object);
 
+String.getClassName = function() {
+    return "java/lang/String";
+}
+ 
 String.prototype["<init>"] = function() {
     return this;
 }
