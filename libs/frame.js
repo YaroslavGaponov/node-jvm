@@ -1466,3 +1466,9 @@ Frame.prototype.instanceof = function(done) {
     }
     return done();
 }
+
+Frame.prototype.checkcast = function(done) {
+    var idx = this._read16();
+    var type = this._get(this._get(idx).name_index).bytes;
+    return done();
+}

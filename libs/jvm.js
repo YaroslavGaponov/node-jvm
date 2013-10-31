@@ -64,7 +64,7 @@ JVM.prototype.api = function() {
                 } else if(fs.existsSync(fileNameBase + ".class")) {
                     return self.loadClassFile(fileNameBase + ".class");
                 } else {
-                    throw new Error(util.format("Implementation of the % class is not found.", className));
+                    throw new Error(util.format("Implementation of the %s class is not found.", className));
                 }
             } else {
                 return classArea;
@@ -137,6 +137,8 @@ JVM.prototype.api = function() {
             }
         }
     };
+    
+    process.API = API;
     
     return API;
 }
