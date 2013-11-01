@@ -19,6 +19,7 @@ describe('Object', function () {
 
 
     });
+
     describe("equals", function () {
         it("should return true for same instance", function () {
             var o1=process.JVM.Loader.createNewObject("SomeObject");
@@ -26,13 +27,14 @@ describe('Object', function () {
 
         });
 
-        it("should return true for different instances", function () {
+        it("should return false for different instances", function () {
             var o1=process.JVM.Loader.createNewObject("SomeObject");
             var o2=process.JVM.Loader.createNewObject("SomeObject");
             expect(o1.equals(o2)).to.be.false;
 
         });
     });
+
     describe("hashcode", function () {
         it("should return an int", function () {
             var o1=process.JVM.Loader.createNewObject("SomeObject");
