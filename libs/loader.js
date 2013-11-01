@@ -129,8 +129,11 @@ Loader.prototype.getMethod = function(className, methodName) {
 Loader.prototype.createNewObject = function(className) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
-        var o = Object.create(this.createNewObject(clazz.getSuperClassName()));
-        o._className = className;
+        
+        var ctor = function() {};
+        ctor.getClassName = new Function (util.format("return \"%s\"", className));
+        ctor.__proto__ = this.createNewObject(clazz.getSuperClassName());
+        var o = new ctor();
         
         clazz.getFields().forEach(function(field) {
             o[clazz.getPoolConstant()[field.name_index].bytes] = null;
