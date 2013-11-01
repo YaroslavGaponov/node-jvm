@@ -11,7 +11,7 @@ var jvm = new JVM();
 
 describe('Object', function () {
     before(function(done){
-        child_process.exec("javac AnObject.java",{cwd:"test"},function(err){
+        child_process.exec("javac AnObject.java",{cwd : __dirname},function(err){
             if (err) throw err;
             jvm.loadClassFiles(__dirname);
             done();
