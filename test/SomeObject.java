@@ -1,9 +1,8 @@
-public class AnObject {
+public class SomeObject {
     private int a;
+    private int b;
 
     public int getB() {
-        AnObject o;
-
         return b;
     }
 
@@ -19,6 +18,5 @@ public class AnObject {
         this.a = a;
     }
 
-    private int b;
 
 }
