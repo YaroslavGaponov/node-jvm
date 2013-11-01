@@ -45,7 +45,7 @@ jvm.run([10]);
 ```
 
 ### build java files
-`cd examples fibonacci; make`
+`cd examples/fibonacci; make`
 
 ### run jvm
 `./fibonacci.js`
