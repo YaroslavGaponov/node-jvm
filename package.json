@@ -7,7 +7,7 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,14 @@
     "virtual",
     "machine"
   ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-mocha-test": "~0.7.0",
+    "chai": "~1.8.0",
+    "sinon": "~1.7.3",
+    "sinon-chai": "~2.4.0",
+    "grunt-node-webkit-builder": "~0.1.11"
+},
   "author": "Yaroslav Gaponov",
   "license": "MIT",
   "readmeFilename": "readme.md",
