@@ -19,6 +19,7 @@ var Frame = module.exports = function(classArea, method) {
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
                 this._code = method.attributes[i].info.code;
+                this._exception_table = method.attributes[i].info.exception_table;
                 this._max_locals = method.attributes[i].info.max_locals;
                 break;
             }
@@ -1471,3 +1472,27 @@ Frame.prototype.checkcast = function(done) {
     var type = this._get(this._get(idx).name_index).bytes;
     return done();
 }
+
+Frame.prototype.athrow = function(done) {
+    var ex = this._stack.pop();
+    var defaultHandler = null;
+    for(var i=0; i<this._exception_table.length; i++) {
+        if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
+            if (this._exception_table[i].catch_type === 0) {
+                defaultHandler = this._exception_table[i].handler_pc;             
+            } else {
+                var exClassName = this._get(this._get(this._exception_table[i].catch_type).name_index).bytes;
+                if (exClassName  === ex.constructor.getClassName()) {
+                    this._ip = this._exception_table[i].handler_pc;
+                    return done();
+                }
+            }
+        }
+    }
+    if (defaultHandler !== null) {
+        this._ip = defaultHandler;
+        return done();        
+    }
+    throw ex;   
+}
+
