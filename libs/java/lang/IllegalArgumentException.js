@@ -4,27 +4,20 @@
 */
 
 var util = require("util");
+var RuntimeException = require("./RuntimeException.js");
 
 var IllegalArgumentException = module.exports = function() {
     if (this instanceof IllegalArgumentException) {
-        Error.captureStackTrace(this, IllegalArgumentException);
-        this.message = null;
+        RuntimeException.call(this);
     } else {
         return new IllegalArgumentException();
     }
 }
 
-util.inherits(IllegalArgumentException, Error);
+util.inherits(IllegalArgumentException, RuntimeException);
 
 IllegalArgumentException.getClassName = function() {
     return "java/lang/IllegalArgumentException";    
 }
 
-IllegalArgumentException.prototype["<init>"] = function(message) {
-    this.message = message;
-}
-
-IllegalArgumentException.prototype.toString = function() {
-    return util.format("Exception %s: %s", IllegalArgumentException.getClassName(), this.message);
-}
 

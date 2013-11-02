@@ -4,27 +4,19 @@
 */
 
 var util = require("util");
+var RuntimeException = require("./RuntimeException.js");
 
 var NullPointerException = module.exports = function() {
     if (this instanceof NullPointerException) {
-        Error.captureStackTrace(this, NullPointerException);
-        this.message = null;
+       RuntimeException.call(this);
     } else {
         return new NullPointerException();
     }
 }
 
-util.inherits(NullPointerException, Error);
+util.inherits(NullPointerException, RuntimeException);
 
 NullPointerException.getClassName = function() {
     return "java/lang/NullPointerException";    
-}
-
-NullPointerException.prototype["<init>"] = function(message) {
-    this.message = message;
-}
-
-NullPointerException.prototype.toString = function() {
-    return util.format("Exception %s: %s", NullPointerException.getClassName(), this.message);
 }
 
