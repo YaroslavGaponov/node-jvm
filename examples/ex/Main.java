@@ -1,5 +1,9 @@
 public class Main {
 	
+	public static void ex() throws ArithmeticException {
+		throw new ArithmeticException("This is ArithmeticException !!!");
+	}
+	
 	public static void main(String[] args) {
 		try {
 			System.out.println("try...");
@@ -9,6 +13,7 @@ public class Main {
 			throw new SecurityException("This is SecurityException  !!!");
 		} finally {
 			System.out.println("finally...");
+			ex();
 			throw new IllegalArgumentException("This is IllegalArgumentException !!!");
 		}
 	}
