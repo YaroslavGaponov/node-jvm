@@ -1,4 +1,4 @@
 
 public class MySystem {
-	public final static MyOut out = new MyOut();
+	public static MyOut out = new MyOut();
 }

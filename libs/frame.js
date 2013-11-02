@@ -1240,11 +1240,18 @@ Frame.prototype.new = function(done) {
 
 Frame.prototype.getstatic = function(done) {
     var idx = this._read16();
-    
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var staticField = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    
     this._stack.push(process.JVM.Loader.getStaticField(className, staticField));
+    return done();
+}
+
+Frame.prototype.putstatic = function(done) {
+    var idx = this._read16();
+    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
+    var staticField = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var clazz = process.JVM.Loader.getClass(className);
+    clazz[staticField] = this._stack.pop();
     return done();
 }
 
@@ -1495,4 +1502,5 @@ Frame.prototype.athrow = function(done) {
     }
     throw ex;   
 }
+
 
