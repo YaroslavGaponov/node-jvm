@@ -56,6 +56,7 @@ Frame.prototype.run = function(args, done) {
     this._ip = 0;
     this._stack = [];
     this._locals = new Array(this._max_locals);
+    this._widened = false;
        
     for(var i=0; i<args.length; i++) {
         this._locals[i] = args[i];
@@ -222,27 +223,52 @@ Frame.prototype.ldc2_w = function(done) {
 }
 
 Frame.prototype.iload = function(done) {
-    this._stack.push(this._locals[this._read8()]);
+    if (this._widened) {
+        this._stack.push(this._locals[this._read16()]);
+        this._widened = false;
+    } else {
+        this._stack.push(this._locals[this._read8()]);
+    }
     return done();
 }
 
 Frame.prototype.lload = function(done) {
-    this._stack.push(this._locals[this._read8()]);
+    if (this._widened) {
+        this._stack.push(this._locals[this._read16()]);
+        this._widened = false;
+    } else {
+        this._stack.push(this._locals[this._read8()]);
+    }
     return done();
 }
 
 Frame.prototype.fload = function(done) {
-    this._stack.push(this._locals[this._read8()]);
+    if (this._widened) {
+        this._stack.push(this._locals[this._read16()]);
+        this._widened = false;
+    } else {
+        this._stack.push(this._locals[this._read8()]);
+    }
     return done();
 }
 
 Frame.prototype.dload = function(done) {
-    this._stack.push(this._locals[this._read8()]);
+    if (this._widened) {
+        this._stack.push(this._locals[this._read16()]);
+        this._widened = false;
+    } else {
+        this._stack.push(this._locals[this._read8()]);
+    }
     return done();
 }
 
 Frame.prototype.aload = function(done) {
-    this._stack.push(this._locals[this._read8()]);
+    if (this._widened) {
+        this._stack.push(this._locals[this._read16()]);
+        this._widened = false;
+    } else {
+        this._stack.push(this._locals[this._read8()]);
+    }
     return done();
 }
 
@@ -424,27 +450,52 @@ Frame.prototype.saload = function(done) {
 }
 
 Frame.prototype.istore = function(done) {
-    this._locals[this._read8()] = this._stack.pop();
+    if (this._widened) {
+        this._locals[this._read16()] = this._stack.pop();
+        this._widened = false;
+    } else {
+        this._locals[this._read8()] = this._stack.pop();
+    }
     return done();
 }
 
 Frame.prototype.lstore = function(done) {
-    this._locals[this._read8()] = this._stack.pop();
+    if (this._widened) {
+        this._locals[this._read16()] = this._stack.pop();
+        this._widened = false;
+    } else {
+        this._locals[this._read8()] = this._stack.pop();
+    }
     return done();
 }
 
 Frame.prototype.fstore = function(done) {
-    this._locals[this._read8()] = this._stack.pop();
+    if (this._widened) {
+        this._locals[this._read16()] = this._stack.pop();
+        this._widened = false;
+    } else {
+        this._locals[this._read8()] = this._stack.pop();
+    }
     return done();
 }
 
 Frame.prototype.dstore = function(done) {
-    this._locals[this._read8()] = this._stack.pop();
+    if (this._widened) {
+        this._locals[this._read16()] = this._stack.pop();
+        this._widened = false;
+    } else {
+        this._locals[this._read8()] = this._stack.pop();
+    }
     return done();
 }
 
 Frame.prototype.astore = function(done) {
-    this._locals[this._read8()] = this._stack.pop();
+    if (this._widened) {
+        this._locals[this._read16()] = this._stack.pop();
+        this._widened = false;
+    } else {
+        this._locals[this._read8()] = this._stack.pop();
+    }
     return done();
 }
 
@@ -697,7 +748,16 @@ Frame.prototype.swap = function(done) {
 
 
 Frame.prototype.iinc = function(done) {
-    this._locals[this._read8()] += this._read8();
+    if (this._widened) {
+        var idx = this._read16();
+        var val = this._read16();
+        this._locals[idx] += val
+        this._widened = false;
+    } else {
+        var idx = this._read8();
+        var val = this._read8();
+        this._locals[idx] += val
+    }
     return done();
 }
 
@@ -1402,8 +1462,12 @@ Frame.prototype.jsr_w = function(done) {
 }
 
 Frame.prototype.ret = function(done) {
-    var idx = this._read8();
-    this._ip = this._locals[idx];
+    if (this._widened) {
+        this._ip = this._locals[this._read16()];
+        this._widened = false;
+    } else {
+        this._ip = this._locals[this._read8()];
+    }
     return done();
 }
 
@@ -1501,6 +1565,11 @@ Frame.prototype.athrow = function(done) {
         return done();        
     }
     throw ex;   
+}
+
+Frame.prototype.wide = function(done) {
+    this._widened = true;
+    return done();
 }
 
 
