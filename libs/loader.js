@@ -76,19 +76,19 @@ Loader.prototype.getClass = function(className) {
 };
         
         
-Loader.prototype.getStaticField = function(className, staticField) {
+Loader.prototype.getStaticField = function(className, fieldName) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
         var fields = clazz.getFields();
         var cp = clazz.getConstantPool();
         for(var i=0; i<fields.length; i++) {
-            if (cp[fields[i].name_index].bytes === staticField) {
-                return null
+            if (cp[fields[i].name_index].bytes === fieldName) {
+                return;
             }
         }
-        throw new Error(util.format("Static field %s.%s is not found.", className, staticField));
+        throw new Error(util.format("Static field %s.%s is not found.", className, fieldName));
     } else {
-        return clazz[staticField];
+        return clazz[fieldName];
     }
 };
         
