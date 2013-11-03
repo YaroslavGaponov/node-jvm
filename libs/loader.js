@@ -1,7 +1,7 @@
 /*
  node-jvm
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
- */
+*/
 
 var util = require("util");
 var fs = require("fs");
@@ -38,23 +38,23 @@ Loader.prototype.getEntryPointFrame = function(className, methodName) {
     for(var name in this.classes) {
         var classArea = this.classes[name];
         if (classArea instanceof ClassArea) {
-            if (!className || (className === classArea.getClassName())) {
+            if (!className || (className === classArea.getClassName())) {    
                 if (ACCESS_FLAGS.isPublic(classArea.getAccessFlags())) {
                     var ms = classArea.getMethods();
                     var cp = classArea.getConstantPool();
                     for(var i=0; i<ms.length; i++) {
                         if
-                            (
-                            ACCESS_FLAGS.isPublic(ms[i].access_flags) &&
-                                ACCESS_FLAGS.isStatic(ms[i].access_flags) &&
-                                cp[ms[i].name_index].bytes === methodName
-                            )
+                        (
+                         ACCESS_FLAGS.isPublic(ms[i].access_flags) &&
+                         ACCESS_FLAGS.isStatic(ms[i].access_flags) &&
+                         cp[ms[i].name_index].bytes === methodName
+                        )
                         { return new Frame(classArea, ms[i]); }
                     }
                 }
             }
         }
-    }
+    }    
 }
 
 Loader.prototype.getClass = function(className) {
@@ -74,8 +74,8 @@ Loader.prototype.getClass = function(className) {
         return classArea;
     }
 };
-
-
+        
+        
 Loader.prototype.getStaticField = function(className, staticField) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
@@ -91,10 +91,10 @@ Loader.prototype.getStaticField = function(className, staticField) {
         return clazz[staticField];
     }
 };
-
-
+        
+        
 Loader.prototype.getStaticMethod = function(className, methodName, signature) {
-    var clazz = this.getClass(className);
+    var clazz = this.getClass(className);  
     if(clazz instanceof ClassArea) {
         var methods = clazz.getMethods();
         var cp = clazz.getConstantPool();
@@ -110,7 +110,7 @@ Loader.prototype.getStaticMethod = function(className, methodName, signature) {
         return clazz[methodName];
     }
 };
-
+        
 Loader.prototype.getMethod = function(className, methodName, signature) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
@@ -129,28 +129,28 @@ Loader.prototype.getMethod = function(className, methodName, signature) {
         return o[methodName];
     }
 };
-
+        
 Loader.prototype.createNewObject = function(className) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
-
+        
         var ctor = function() {};
         ctor.getClassName = new Function(util.format("return \"%s\"", className));
-        ctor.prototype = this.createNewObject(clazz.getSuperClassName());
+        ctor.__proto__ = this.createNewObject(clazz.getSuperClassName());
         var o = new ctor();
-
+        
         var cp = clazz.getConstantPool();
-
+        
         clazz.getFields().forEach(function(field) {
             var fieldName = cp[field.name_index].bytes;
             o[fieldName] = null;
         });
-
+        
         clazz.getMethods().forEach(function(method) {
             var methodName = cp[method.name_index].bytes;
             o[methodName] = new Frame(clazz, method);
         });
-
+        
         return o;
     } else {
         return new clazz();
