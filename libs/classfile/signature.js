@@ -3,6 +3,8 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
+var util = require("util");
+
 var TYPE = module.exports.TYPE = {
     boolean:    'Z',
     byte:       'B',
@@ -69,7 +71,8 @@ var parse = module.exports.parse = function(s) {
         
     return {
         IN: _parse(IN),
-        OUT: _parse(OUT)
+        OUT: _parse(OUT),
+        toString: new Function(util.format("return \"%s\"", s))
     };
 };
 

@@ -1323,26 +1323,25 @@ Frame.prototype.invokestatic = function(done) {
     
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
     
-
     var args = [];
-    for (var i=0; i<argsType.IN.length; i++) {
+    for (var i=0; i<signature.IN.length; i++) {
         args.unshift(this._stack.pop());
     }
     
-    var method = process.JVM.Loader.getStaticMethod(className, methodName);
+    var method = process.JVM.Loader.getStaticMethod(className, methodName, signature);
     
     if (method instanceof Frame) {
         method.run(args, function(res) {
-            if (argsType.OUT.length != 0) {                        
+            if (signature.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();
         });
     } else {
         var res = method.apply(null, args);
-        if (argsType.OUT.length != 0) {                        
+        if (signature.OUT.length != 0) {                        
             self._stack.push(res);                        
         }
         return done();
@@ -1357,27 +1356,27 @@ Frame.prototype.invokevirtual = function(done) {
     
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
     
     var args = [];
-    for (var i=0; i<argsType.IN.length; i++) {
+    for (var i=0; i<signature.IN.length; i++) {
         args.unshift(this._stack.pop());
     }
     
     var instance = this._stack.pop();
-    var method = process.JVM.Loader.getMethod(className, methodName, argsType);
+    var method = process.JVM.Loader.getMethod(className, methodName, signature);
       
     if (method instanceof Frame) {
         args.unshift(instance);
         method.run(args, function(res) {
-            if (argsType.OUT.length != 0) {                        
+            if (signature.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();            
         });
     } else {
         var res = method.apply(instance, args);        
-        if (argsType.OUT.length != 0) {
+        if (signature.OUT.length != 0) {
             self._stack.push(res);
         }
         return done();
@@ -1391,15 +1390,15 @@ Frame.prototype.invokespecial = function(done) {
     
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
     
     var args = [];
-    for (var i=0; i<argsType.IN.length; i++) {
+    for (var i=0; i<signature.IN.length; i++) {
         args.unshift(this._stack.pop());
     }
 
     var instance = this._stack.pop();
-    var ctor = process.JVM.Loader.getMethod(className, methodName, argsType);
+    var ctor = process.JVM.Loader.getMethod(className, methodName, signature);
     
     if (ctor instanceof Frame) {
         args.unshift(instance);
@@ -1422,10 +1421,10 @@ Frame.prototype.invokeinterface = function(done) {
     
     var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
     var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var argsType = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
     
     var args = [];
-    for (var i=0; i<argsType.IN.length; i++) {
+    for (var i=0; i<signature.IN.length; i++) {
         args.unshift(this._stack.pop());
     }
 
@@ -1434,14 +1433,14 @@ Frame.prototype.invokeinterface = function(done) {
     if (instance[methodName] instanceof Frame) {
         args.unshift(instance);
         instance[methodName].run(args, function(res) {
-            if (argsType.OUT.length != 0) {                        
+            if (signature.OUT.length != 0) {                        
                self._stack.push(res);
             }
             return done();            
         });
     } else {
         var res = instance[methodName].apply(instance, args);
-        if (argsType.OUT.length != 0) {
+        if (signature.OUT.length != 0) {
             self._stack.push(res);
         }
         return done();

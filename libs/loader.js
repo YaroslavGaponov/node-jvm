@@ -9,7 +9,6 @@ var fs = require("fs");
 var ClassArea = require("./classfile/classarea.js");
 var Frame = require("./frame.js");
 var ACCESS_FLAGS = require("./classfile/accessflags.js");
-var Signature = require("./classfile/signature.js");
 
 var Loader = module.exports = function() {
     if (this instanceof Loader) {
@@ -94,14 +93,16 @@ Loader.prototype.getStaticField = function(className, staticField) {
 };
         
         
-Loader.prototype.getStaticMethod = function(className, methodName) {
+Loader.prototype.getStaticMethod = function(className, methodName, signature) {
     var clazz = this.getClass(className);  
     if(clazz instanceof ClassArea) {
         var methods = clazz.getMethods();
         var constantPool = clazz.getPoolConstant();
         for(var i=0; i<methods.length; i++) {
             if (constantPool[methods[i].name_index].bytes === methodName) {
-                return new Frame(clazz, methods[i]);    
+                if (signature.toString() === constantPool[methods[i].signature_index].bytes) {
+                    return new Frame(clazz, methods[i]);
+                }
             }
         }
         throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
@@ -110,16 +111,14 @@ Loader.prototype.getStaticMethod = function(className, methodName) {
     }
 };
         
-Loader.prototype.getMethod = function(className, methodName, argsType) {
+Loader.prototype.getMethod = function(className, methodName, signature) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
         var methods = clazz.getMethods();
         var constantPool = clazz.getPoolConstant();
         for(var i=0; i<methods.length; i++) {
             if (constantPool[methods[i].name_index].bytes === methodName) {
-                // TO DO: search with right args
-                var args = Signature.parse(constantPool[methods[i].signature_index].bytes);
-                if (argsType.IN.length == args.IN.length) {
+                if (signature.toString() === constantPool[methods[i].signature_index].bytes) {
                     return new Frame(clazz, methods[i]);
                 }
             }
@@ -136,7 +135,7 @@ Loader.prototype.createNewObject = function(className) {
     if (clazz instanceof ClassArea) {
         
         var ctor = function() {};
-        ctor.getClassName = new Function (util.format("return \"%s\"", className));
+        ctor.getClassName = new Function(util.format("return \"%s\"", className));
         ctor.__proto__ = this.createNewObject(clazz.getSuperClassName());
         var o = new ctor();
         
