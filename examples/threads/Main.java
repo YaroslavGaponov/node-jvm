@@ -11,7 +11,7 @@ public class Main {
 		Dog sten = new Dog("Sten", 15, locker);
 		Thread stenThread = new Thread(sten);
 		
-		Dog nika = new Dog("Nika", 30, null);
+		Dog nika = new Dog("Nika", 30);
 		Thread nikaThread = new Thread(nika);
 
 		mikeThread.start();

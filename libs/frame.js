@@ -1365,7 +1365,7 @@ Frame.prototype.invokevirtual = function(done) {
     }
     
     var instance = this._stack.pop();
-    var method = process.JVM.Loader.getMethod(className, methodName);
+    var method = process.JVM.Loader.getMethod(className, methodName, argsType);
       
     if (method instanceof Frame) {
         args.unshift(instance);
@@ -1399,7 +1399,7 @@ Frame.prototype.invokespecial = function(done) {
     }
 
     var instance = this._stack.pop();
-    var ctor = process.JVM.Loader.getMethod(className, methodName);
+    var ctor = process.JVM.Loader.getMethod(className, methodName, argsType);
     
     if (ctor instanceof Frame) {
         args.unshift(instance);

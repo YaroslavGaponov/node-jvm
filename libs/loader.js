@@ -9,6 +9,7 @@ var fs = require("fs");
 var ClassArea = require("./classfile/classarea.js");
 var Frame = require("./frame.js");
 var ACCESS_FLAGS = require("./classfile/accessflags.js");
+var Signature = require("./classfile/signature.js");
 
 var Loader = module.exports = function() {
     if (this instanceof Loader) {
@@ -109,14 +110,18 @@ Loader.prototype.getStaticMethod = function(className, methodName) {
     }
 };
         
-Loader.prototype.getMethod = function(className, methodName) {
+Loader.prototype.getMethod = function(className, methodName, argsType) {
     var clazz = this.getClass(className);
     if (clazz instanceof ClassArea) {
         var methods = clazz.getMethods();
         var constantPool = clazz.getPoolConstant();
         for(var i=0; i<methods.length; i++) {
             if (constantPool[methods[i].name_index].bytes === methodName) {
-                return new Frame(clazz, methods[i]);    
+                // TO DO: search with right args
+                var args = Signature.parse(constantPool[methods[i].signature_index].bytes);
+                if (argsType.IN.length == args.IN.length) {
+                    return new Frame(clazz, methods[i]);
+                }
             }
         }
         throw new Error(util.format("Method %s.%s is not found.", className, methodName));

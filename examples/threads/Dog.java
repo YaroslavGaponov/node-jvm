@@ -4,10 +4,15 @@ class Dog implements Runnable {
 	private int length;
 
         
-        public Dog(String name, int length, Object obj) {
-                this.obj = obj;
+        public Dog(String name, int length) {
+                this.obj = null;
 		this.name = name;
                 this.length = length;
+	}
+        
+        public Dog(String name, int length, Object obj) {
+                this(name, length);
+                this.obj = obj;
 	}
 
 	public void run() {
