@@ -15,6 +15,7 @@ var Frame = module.exports = function(classArea, method) {
         
         this._classArea = classArea;
         this._method = method;
+        this._cp = classArea.getConstantPool();
         
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
@@ -30,10 +31,6 @@ var Frame = module.exports = function(classArea, method) {
     }
 }
 
-Frame.prototype._fetch8 = function() {
-    return this._code[this._ip];
-};
-
 Frame.prototype._read8 = function() {
     return this._code[this._ip++];
 };
@@ -45,10 +42,6 @@ Frame.prototype._read16 = function() {
 Frame.prototype._read32 = function() {
     return this._read16()<<16 | this._read16();
 };
-
-Frame.prototype._get = function(index) {
-    return this._classArea.getPoolConstant()[index];
-}
 
 Frame.prototype.run = function(args, done) {
     var self = this;
@@ -187,10 +180,10 @@ Frame.prototype.bipush = function(done) {
 }
 
 Frame.prototype.ldc = function(done) {
-    var constant = this._get(this._read8());
+    var constant = this._cp[this._read8()];
     switch(constant.tag) {
         case TAGS.CONSTANT_String:                        
-            this._stack.push(this._get(constant.string_index).bytes);
+            this._stack.push(this._cp[constant.string_index].bytes);
             break;
         default:
             throw new Error("not support constant type");
@@ -199,10 +192,10 @@ Frame.prototype.ldc = function(done) {
 }
 
 Frame.prototype.ldc_w = function(done) {
-    var constant = this._get(this._read16());
+    var constant = this._cp[this._read16()];
     switch(constant.tag) {
         case TAGS.CONSTANT_String:                        
-            this._stack.push(this._get(constant.string_index).bytes);
+            this._stack.push(this._cp[constant.string_index].bytes);
             break;
         default:
             throw new Error("not support constant type");
@@ -211,10 +204,10 @@ Frame.prototype.ldc_w = function(done) {
 }
 
 Frame.prototype.ldc2_w = function(done) {
-    var constant = this._get(this._read16());
+    var constant = this._cp[this._read16()];
     switch(constant.tag) {
         case TAGS.CONSTANT_String:                        
-            this._stack.push(this._get(constant.string_index).bytes);
+            this._stack.push(this._cp[constant.string_index].bytes);
             break;
         default:
             throw new Error("not support constant type");
@@ -223,52 +216,37 @@ Frame.prototype.ldc2_w = function(done) {
 }
 
 Frame.prototype.iload = function(done) {
-    if (this._widened) {
-        this._stack.push(this._locals[this._read16()]);
-        this._widened = false;
-    } else {
-        this._stack.push(this._locals[this._read8()]);
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._stack.push(this._locals[idx]);
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.lload = function(done) {
-    if (this._widened) {
-        this._stack.push(this._locals[this._read16()]);
-        this._widened = false;
-    } else {
-        this._stack.push(this._locals[this._read8()]);
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._stack.push(this._locals[idx]);
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.fload = function(done) {
-    if (this._widened) {
-        this._stack.push(this._locals[this._read16()]);
-        this._widened = false;
-    } else {
-        this._stack.push(this._locals[this._read8()]);
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._stack.push(this._locals[idx]);
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.dload = function(done) {
-    if (this._widened) {
-        this._stack.push(this._locals[this._read16()]);
-        this._widened = false;
-    } else {
-        this._stack.push(this._locals[this._read8()]);
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._stack.push(this._locals[idx]);
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.aload = function(done) {
-    if (this._widened) {
-        this._stack.push(this._locals[this._read16()]);
-        this._widened = false;
-    } else {
-        this._stack.push(this._locals[this._read8()]);
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._stack.push(this._locals[idx]);
+    this._widened = false;
     return done();
 }
 
@@ -450,52 +428,37 @@ Frame.prototype.saload = function(done) {
 }
 
 Frame.prototype.istore = function(done) {
-    if (this._widened) {
-        this._locals[this._read16()] = this._stack.pop();
-        this._widened = false;
-    } else {
-        this._locals[this._read8()] = this._stack.pop();
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._locals[idx] = this._stack.pop();
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.lstore = function(done) {
-    if (this._widened) {
-        this._locals[this._read16()] = this._stack.pop();
-        this._widened = false;
-    } else {
-        this._locals[this._read8()] = this._stack.pop();
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._locals[idx] = this._stack.pop();
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.fstore = function(done) {
-    if (this._widened) {
-        this._locals[this._read16()] = this._stack.pop();
-        this._widened = false;
-    } else {
-        this._locals[this._read8()] = this._stack.pop();
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._locals[idx] = this._stack.pop();
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.dstore = function(done) {
-    if (this._widened) {
-        this._locals[this._read16()] = this._stack.pop();
-        this._widened = false;
-    } else {
-        this._locals[this._read8()] = this._stack.pop();
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._locals[idx] = this._stack.pop();
+    this._widened = false;
     return done();
 }
 
 Frame.prototype.astore = function(done) {
-    if (this._widened) {
-        this._locals[this._read16()] = this._stack.pop();
-        this._widened = false;
-    } else {
-        this._locals[this._read8()] = this._stack.pop();
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    this._locals[idx] = this._stack.pop();
+    this._widened = false;
     return done();
 }
 
@@ -748,16 +711,10 @@ Frame.prototype.swap = function(done) {
 
 
 Frame.prototype.iinc = function(done) {
-    if (this._widened) {
-        var idx = this._read16();
-        var val = this._read16();
-        this._locals[idx] += val
-        this._widened = false;
-    } else {
-        var idx = this._read8();
-        var val = this._read8();
-        this._locals[idx] += val
-    }
+    var idx = this._widened ? this._read16() : this._read8();
+    var val = this._widened ? this._read16() : this._read8();
+    this._locals[idx] += val
+    this._widened = false;
     return done();
 }
 
@@ -1053,7 +1010,7 @@ Frame.prototype.newarray = function(done) {
 
 Frame.prototype.anewarray = function(done) {
     var idx = this._read16();
-    var className = this._get(this._get(idx).name_index).bytes;       
+    var className = this._cp[this._cp[idx].name_index].bytes;       
     var size = this._stack.pop();
     this._stack.push(new Array(size));
     return done();
@@ -1061,7 +1018,7 @@ Frame.prototype.anewarray = function(done) {
 
 Frame.prototype.multianewarray = function(done) {
     var idx = this._read16();
-    var type = this._get(this._get(idx).name_index).bytes;       
+    var type = this._cp[this._cp[idx].name_index].bytes;       
     var dimensions = this._read8();
     var lengths = new Array(dimensions);
     for(var i=0; i<dimensions; i++) {
@@ -1273,7 +1230,7 @@ Frame.prototype.ifnonnull = function(done) {
 Frame.prototype.putfield = function(done) {
     var idx = this._read16();
     
-    var fieldName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;    
+    var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;    
     var val = this._stack.pop();
     var obj = this._stack.pop();
     obj[fieldName] = val;
@@ -1283,7 +1240,7 @@ Frame.prototype.putfield = function(done) {
 Frame.prototype.getfield = function(done) {    
     var idx = this._read16();
     
-    var fieldName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var obj = this._stack.pop();
     this._stack.push(obj[fieldName]);
 
@@ -1294,23 +1251,23 @@ Frame.prototype.getfield = function(done) {
 Frame.prototype.new = function(done) {
     var idx = this._read16();
     
-    var className = this._get(this._get(idx).name_index).bytes;    
+    var className = this._cp[this._cp[idx].name_index].bytes;    
     this._stack.push(process.JVM.Loader.createNewObject(className));
     return done();
 }
 
 Frame.prototype.getstatic = function(done) {
     var idx = this._read16();
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var staticField = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     this._stack.push(process.JVM.Loader.getStaticField(className, staticField));
     return done();
 }
 
 Frame.prototype.putstatic = function(done) {
     var idx = this._read16();
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var staticField = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var clazz = process.JVM.Loader.getClass(className);
     clazz[staticField] = this._stack.pop();
     return done();
@@ -1321,9 +1278,9 @@ Frame.prototype.invokestatic = function(done) {
     
     var idx = this._read16();
     
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var methodName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    var signature = Signature.parse(this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes);
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
@@ -1354,9 +1311,9 @@ Frame.prototype.invokevirtual = function(done) {
     
     var idx = this._read16();
     
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var methodName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    var signature = Signature.parse(this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes);
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
@@ -1388,9 +1345,9 @@ Frame.prototype.invokespecial = function(done) {
     
     var idx = this._read16();
     
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var methodName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    var signature = Signature.parse(this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes);
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
@@ -1419,9 +1376,9 @@ Frame.prototype.invokeinterface = function(done) {
     var argsNumber = this._read8();
     var zero = this._read8();
     
-    var className = this._get(this._get(this._get(idx).class_index).name_index).bytes;
-    var methodName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
-    var signature = Signature.parse(this._get(this._get(this._get(idx).name_and_type_index).signature_index).bytes);
+    var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
+    var methodName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    var signature = Signature.parse(this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes);
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
@@ -1461,13 +1418,10 @@ Frame.prototype.jsr_w = function(done) {
     return done();
 }
 
-Frame.prototype.ret = function(done) {
-    if (this._widened) {
-        this._ip = this._locals[this._read16()];
-        this._widened = false;
-    } else {
-        this._ip = this._locals[this._read8()];
-    }
+Frame.prototype.ret = function(done) {   
+    var idx = this._widened ? this._read16() : this._read8();
+    this._ip = this._locals[idx]; 
+    this._widened = false;
     return done();
 }
 
@@ -1528,7 +1482,7 @@ Frame.prototype.lookupswitch = function(done) {
 
 Frame.prototype.instanceof = function(done) {
     var idx = this._read16();
-    var className = this._get(this._get(idx).name_index).bytes;
+    var className = this._cp[this._cp[idx].name_index].bytes;
     var obj = this._stack.pop();
     if (obj.constructor.getClassName() === className) {
         this._stack.push(true);
@@ -1540,7 +1494,7 @@ Frame.prototype.instanceof = function(done) {
 
 Frame.prototype.checkcast = function(done) {
     var idx = this._read16();
-    var type = this._get(this._get(idx).name_index).bytes;
+    var type = this._cp[this._cp[idx].name_index].bytes;
     return done();
 }
 
@@ -1552,7 +1506,7 @@ Frame.prototype.athrow = function(done) {
             if (this._exception_table[i].catch_type === 0) {
                 defaultHandler = this._exception_table[i].handler_pc;             
             } else {
-                var exClassName = this._get(this._get(this._exception_table[i].catch_type).name_index).bytes;
+                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
                 if (exClassName  === ex.constructor.getClassName()) {
                     this._ip = this._exception_table[i].handler_pc;
                     return done();
@@ -1574,18 +1528,18 @@ Frame.prototype.wide = function(done) {
 
 Frame.prototype.monitorenter = function(done) {
     var obj = this._stack.pop();
-    if (obj.hasOwnProperty("lock") && obj.lock === true) {
+    if (obj.hasOwnProperty("$lock$") && obj["$lock$"] === true) {
         this._stack.push(obj);
         this._ip--;
     } else {
-        obj.lock = true;
+        obj["$lock$"] = true;
     }
     return done();
 }
 
 Frame.prototype.monitorexit = function(done) {
     var obj = this._stack.pop();
-    obj.lock = false;
+    obj["$lock$"] = false;
     return done();
 }
 

@@ -23,5 +23,43 @@ var ACCESS_FLAGS = module.exports = {
             }
         }
         return flagNames.toString();
+    },
+    checkFlag: function(flag) {
+        return function(flags) {
+            return flags & flag === flag;
+        }
+    },
+    isPublic: function(flags) {
+        return this.checkFlag(this.ACC_PUBLIC);
+    },
+    isPrivate: function(flags) {
+        return this.checkFlag(this.ACC_PRIVATE);
+    },
+    isProtected: function(flags) {
+        return this.checkFlag(this.ACC_PROTECTED);
+    },
+    isStatic: function(flags) {
+        return this.checkFlag(this.ACC_STATIC);
+    },
+    isFinal: function(flags) {
+        return this.checkFlag(this.ACC_FINAL);
+    },
+    isSynchronized: function(flags) {
+        return this.checkFlag(this.ACC_SYNCHRONIZED);
+    },
+    isVolatile: function(flags) {
+        return this.checkFlag(this.ACC_VOLATILE);
+    },
+    isTransient: function(flags) {
+        return this.checkFlag(this.ACC_TRANSIENT);
+    },
+    isNative: function(flags) {
+        return this.checkFlag(this.ACC_NATIVE);
+    },
+    isInterface: function(flags) {
+        return this.checkFlag(this.ACC_INTERFACE);
+    },
+    isAbstract: function(flags) {
+        return this.checkFlag(this.ACC_ABSTRACT);
     }
 };

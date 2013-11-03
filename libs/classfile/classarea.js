@@ -30,7 +30,7 @@ ClassArea.prototype.getAccessFlags = function() {
     return this.classImage.access_flags;    
 }
 
-ClassArea.prototype.getPoolConstant = function() {
+ClassArea.prototype.getConstantPool = function() {
     return this.classImage.constant_pool;
 }
 
