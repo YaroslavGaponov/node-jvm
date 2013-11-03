@@ -2,5 +2,5 @@
 
 var JVM = require("../../index");
 var jvm = new JVM();
-jvm.loadClassFile("./Main.class");
-jvm.run([10]);
+jvm.loadClassFiles(__dirname);
+jvm.run([15]);
