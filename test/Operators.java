@@ -27,7 +27,7 @@ public class Operators {
     }
 
 
-  /*  public long sumLong(long one,long two){
+    public long sumLong(long one,long two){
         return one+two;
 
     }
@@ -52,5 +52,5 @@ public class Operators {
     public long remaindLong(long one,long two){
         return one % two;
 
-    }*/
+    }
 }

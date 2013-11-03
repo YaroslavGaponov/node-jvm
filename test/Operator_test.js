@@ -73,7 +73,7 @@ describe('Operator', function () {
             });
         });
     });
-
+/*
     describe("with longs", function () {
         describe("+", function () {
             it("return sum", function (done) {
@@ -124,6 +124,6 @@ describe('Operator', function () {
                 });
             });
         });
-    });
+    });*/
 });
 
