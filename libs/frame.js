@@ -1286,6 +1286,7 @@ Frame.prototype.getfield = function(done) {
     var fieldName = this._get(this._get(this._get(idx).name_and_type_index).name_index).bytes;
     var obj = this._stack.pop();
     this._stack.push(obj[fieldName]);
+
     return done();
 }
 
@@ -1572,4 +1573,20 @@ Frame.prototype.wide = function(done) {
     return done();
 }
 
+Frame.prototype.monitorenter = function(done) {
+    var obj = this._stack.pop();
+    if (obj.hasOwnProperty("lock") && obj.lock === true) {
+        this._stack.push(obj);
+        this._ip--;
+    } else {
+        obj.lock = true;
+    }
+    return done();
+}
+
+Frame.prototype.monitorexit = function(done) {
+    var obj = this._stack.pop();
+    obj.lock = false;
+    return done();
+}
 
