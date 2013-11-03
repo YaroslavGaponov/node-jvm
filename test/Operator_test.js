@@ -12,6 +12,7 @@ var jvm = new JVM();
 describe('Operator', function () {
     var o1;
     before(function (done) {
+        this.timeout(5000);
         child_process.exec("javac Operators.java", {cwd: __dirname}, function (err) {
             if (err) throw err;
             jvm.loadClassFiles(__dirname);
