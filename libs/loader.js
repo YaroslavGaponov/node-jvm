@@ -136,11 +136,11 @@ Loader.prototype.createNewObject = function(className) {
         
         var ctor = function() {};
         ctor.getClassName = new Function(util.format("return \"%s\"", className));
-        ctor.__proto__ = this.createNewObject(clazz.getSuperClassName());
+        ctor.prototype = this.createNewObject(clazz.getSuperClassName());
         var o = new ctor();
         
         var cp = clazz.getConstantPool();
-        
+
         clazz.getFields().forEach(function(field) {
             var fieldName = cp[field.name_index].bytes;
             o[fieldName] = null;
