@@ -68,7 +68,9 @@ Loader.prototype.getClass = function(className) {
         } else if(fs.existsSync(fileNameBase + ".class")) {
             return this.loadClassFile(fileNameBase + ".class");
         } else {
-            throw new Error(util.format("Implementation of the %s class is not found.", className));
+            var classNotFoundException = this.createNewObject("java/lang/ClassNotFoundException");
+            classNotFoundException["<init>"](util.format("Implementation of the %s class is not found.", className));
+            throw classNotFoundException;
         }
     } else {
         return classArea;
