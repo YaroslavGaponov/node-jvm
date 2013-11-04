@@ -20,8 +20,8 @@ var Frame = module.exports = function(classArea, method) {
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
                 this._code = method.attributes[i].info.code;
-                this._exception_table = method.attributes[i].info.exception_table;
-                this._max_locals = method.attributes[i].info.max_locals;
+                this._exceptionTable = method.attributes[i].info.exception_table;
+                this._maxLocals = method.attributes[i].info.max_locals;
                 break;
             }
         }
@@ -48,7 +48,7 @@ Frame.prototype.run = function(args, done) {
     
     this._ip = 0;
     this._stack = [];
-    this._locals = new Array(this._max_locals);
+    this._locals = new Array(this._maxLocals);
     this._widened = false;
        
     for(var i=0; i<args.length; i++) {
@@ -56,30 +56,29 @@ Frame.prototype.run = function(args, done) {
     }
     
     var step = function() {
+        
         setImmediate(function() {
+            
             var opCode = self._read8()
             
-            switch(opCode) {
-                case Opcodes.return:
-                   return done();
+            switch (opCode) {
+                case Opcodes.return:    return done();
                 case Opcodes.ireturn:
                 case Opcodes.lreturn:
                 case Opcodes.freturn:
                 case Opcodes.dreturn:
-                case Opcodes.areturn:
-                    return done(self._stack.pop());
+                case Opcodes.areturn:   return done(self._stack.pop());
             }
     
-            var opName = Opcodes.toString(opCode);
+            var opName = Opcodes.op[opCode];
             
-            if (!self[opName]) {
+            if (!(opName in self)) {
                 throw new Error(util.format("Opcode %s [%s] is not support.", opName, opCode));
             }
 
-            self[opName](function() {
-                return step();
-            });
+            self[opName]( function() { return step(); } );
         });
+        
     };
     
     step();
@@ -1501,14 +1500,14 @@ Frame.prototype.checkcast = function(done) {
 Frame.prototype.athrow = function(done) {
     var ex = this._stack.pop();
     var defaultHandler = null;
-    for(var i=0; i<this._exception_table.length; i++) {
-        if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
-            if (this._exception_table[i].catch_type === 0) {
-                defaultHandler = this._exception_table[i].handler_pc;             
+    for(var i=0; i<this._exceptionTable.length; i++) {
+        if (this._ip >= this._exceptionTable[i].start_pc && this._ip <= this._exceptionTable[i].end_pc) {
+            if (this._exceptionTable[i].catch_type === 0) {
+                defaultHandler = this._exceptionTable[i].handler_pc;             
             } else {
-                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
+                var exClassName = this._cp[this._cp[this._exceptionTable[i].catch_type].name_index].bytes;
                 if (exClassName  === ex.constructor.getClassName()) {
-                    this._ip = this._exception_table[i].handler_pc;
+                    this._ip = this._exceptionTable[i].handler_pc;
                     return done();
                 }
             }

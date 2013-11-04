@@ -53,19 +53,7 @@ JVM.prototype.run = function() {
     if (!entryPointFrame) {
         throw new Error("Entry point method is not found.");
     }
-    
-    var notSupportedOpcode = [];
-    for (var opcode in Opcodes) {
-        if (!entryPointFrame[opcode]) {
-            if (["return", "ireturn", "lreturn", "dreturn", "freturn", "areturn"].indexOf(opcode) === -1) {
-                notSupportedOpcode.push(opcode);
-            }
-        }
-    }
-    if (notSupportedOpcode.length > 0) {
-        util.debug("Not supported opcodes: " + notSupportedOpcode.toString());
-    }
-    
+
     entryPointFrame.run(arguments, function(code) {
         var halt = function() {
             setImmediate(function() {
@@ -78,6 +66,5 @@ JVM.prototype.run = function() {
         };
         halt();
     });
-    
 }
 
