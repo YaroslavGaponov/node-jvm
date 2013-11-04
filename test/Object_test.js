@@ -11,6 +11,7 @@ var jvm = new JVM();
 
 describe('Object', function () {
     before(function(done){
+        this.timeout(10000);
         child_process.exec("javac SomeObject.java",{cwd : __dirname},function(err){
             if (err) throw err;
             jvm.loadClassFiles(__dirname);
@@ -34,6 +35,25 @@ describe('Object', function () {
 
         });
     });
+   /* describe("getClass", function () {
+        it("return correct class object", function () {
+            var o1=process.JVM.Loader.createNewObject("SomeObject");
+
+            expect(o1.getClass().getSimpleName()).to.be.equal('SomeObject');
+
+
+        });
+    });
+
+    describe("toString", function () {
+        it("return correct class object", function () {
+            var o1=process.JVM.Loader.createNewObject("SomeObject");
+
+            expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode().toString(16));
+
+
+        });
+    });*/
 
     describe("hashcode", function () {
         it("should return an int", function () {
