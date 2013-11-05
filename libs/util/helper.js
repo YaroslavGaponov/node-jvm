@@ -4,18 +4,28 @@
 */
 
 module.exports.getSByte = function(v) {
-    n = parseInt(v, 10) & 255;
-    if (n > 127) {
-        n = -((n & 127) ^ 127) - 1;
+    n = parseInt(v, 10) & 0xff;
+    if (n > 0x7F) {
+        n = -((n & 0x7F) ^ 0x7F) - 1;
     }
     return n
 }
 
 module.exports.getSInt = function(v) {
-    n = parseInt(v, 10) & 65535;
-    if (n > 32767) {
-        n = -((n & 32767) ^ 32767) - 1;
+    n = parseInt(v, 10) & 0xffff;
+    if (n > 0x7FFF) {
+        n = -((n & 0x7FFF) ^ 0x7FFF) - 1;
     }
     return n
 }
+
+module.exports.getLong = function(bytes) {
+    var l = 0;
+    for(var i = 0; i < 8; i++) {
+       l <<= 8;
+       l ^= bytes[i] & 0xFF;
+    }
+    return l;
+}
+
 

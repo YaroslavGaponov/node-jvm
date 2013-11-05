@@ -167,6 +167,15 @@ var getClassImage = function(classBytes) {
                 var bytes = reader.read32();
                 classImage.constant_pool.push( {  tag: tag, bytes: bytes } );                                                
                 break;
+            case TAGS.CONSTANT_Double:
+            case TAGS.CONSTANT_Long:
+                var bytes = new Buffer(8);
+                for (var b=0; b<8; b++) {
+                    bytes[b] = reader.read8();
+                }
+                classImage.constant_pool.push( {  tag: tag, bytes: bytes } );
+                classImage.constant_pool.push( null ); i++;
+                break;
             case TAGS.CONSTANT_Fieldref:
             case TAGS.CONSTANT_Methodref:
             case TAGS.CONSTANT_InterfaceMethodref:

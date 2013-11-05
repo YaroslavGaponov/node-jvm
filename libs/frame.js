@@ -208,6 +208,12 @@ Frame.prototype.ldc2_w = function(done) {
         case TAGS.CONSTANT_String:                        
             this._stack.push(this._cp[constant.string_index].bytes);
             break;
+        case TAGS.CONSTANT_Long:
+            this._stack.push(Helper.getLong(constant.bytes));
+            break;
+        case TAGS.CONSTANT_Double:
+            this._stack.push(constant.bytes.readDoubleBE(0));
+            break;
         default:
             throw new Error("not support constant type");
     }
@@ -1283,7 +1289,12 @@ Frame.prototype.invokestatic = function(done) {
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
-        args.unshift(this._stack.pop());
+        if (!signature.IN[i].isArray && ["long", "double"].indexOf(signature.IN[i].type) !== -1) {
+            args.unshift("");
+            args.unshift(this._stack.pop());
+        } else {
+            args.unshift(this._stack.pop());
+        }
     }
     
     var method = process.JVM.Loader.getStaticMethod(className, methodName, signature);
@@ -1316,8 +1327,14 @@ Frame.prototype.invokevirtual = function(done) {
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
-        args.unshift(this._stack.pop());
+        if (!signature.IN[i].isArray && ["long", "double"].indexOf(signature.IN[i].type) !== -1) {
+            args.unshift("");
+            args.unshift(this._stack.pop());
+        } else {
+            args.unshift(this._stack.pop());
+        }
     }
+
     
     var instance = this._stack.pop();
     var method = process.JVM.Loader.getMethod(className, methodName, signature);
@@ -1350,8 +1367,14 @@ Frame.prototype.invokespecial = function(done) {
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
-        args.unshift(this._stack.pop());
+        if (!signature.IN[i].isArray && ["long", "double"].indexOf(signature.IN[i].type) !== -1) {
+            args.unshift("");
+            args.unshift(this._stack.pop());
+        } else {
+            args.unshift(this._stack.pop());
+        }
     }
+
 
     var instance = this._stack.pop();
     var ctor = process.JVM.Loader.getMethod(className, methodName, signature);
@@ -1381,8 +1404,14 @@ Frame.prototype.invokeinterface = function(done) {
     
     var args = [];
     for (var i=0; i<signature.IN.length; i++) {
-        args.unshift(this._stack.pop());
+        if (!signature.IN[i].isArray && ["long", "double"].indexOf(signature.IN[i].type) !== -1) {
+            args.unshift("");
+            args.unshift(this._stack.pop());
+        } else {
+            args.unshift(this._stack.pop());
+        }
     }
+
 
     var instance = this._stack.pop();
       
@@ -1527,18 +1556,18 @@ Frame.prototype.wide = function(done) {
 
 Frame.prototype.monitorenter = function(done) {
     var obj = this._stack.pop();
-    if (obj.hasOwnProperty("$lock$") && obj["$lock$"] === true) {
+    if (obj.hasOwnProperty("$lock$")) {
         this._stack.push(obj);
         this._ip--;
     } else {
-        obj["$lock$"] = true;
+        obj["$lock$"] = "locked";
     }
     return done();
 }
 
 Frame.prototype.monitorexit = function(done) {
     var obj = this._stack.pop();
-    obj["$lock$"] = false;
+    delete obj["$lock$"];
     return done();
 }
 
