@@ -45,6 +45,13 @@ module.exports.initialize = function() {
     if ( ! global.THREADS ) {
         global.THREADS = new Threads();
     }
+}
+
+module.exports.getInstance = function() {
+    if ( ! global.THREADS ) {
+        global.THREADS = new Threads();
+    }
     return global.THREADS;
 }
+
 

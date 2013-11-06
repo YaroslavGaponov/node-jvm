@@ -227,5 +227,11 @@ module.exports.initialize = function() {
     if ( !global.OPCODES ) {
         global.OPCODES = OPCODES;
     }
+};
+
+module.exports.getInstance = function() {
+    if ( !global.OPCODES ) {
+        global.OPCODES = OPCODES;
+    }
     return global.OPCODES;
 };

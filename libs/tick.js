@@ -7,5 +7,8 @@ module.exports.initialize = function() {
     if ( !global.TICK ) {
         global.TICK = setImmediate || process.nextTick;
     }
-    return global.TICK;
+}
+
+module.exports.getTick = function() {
+    return setImmediate || process.nextTick;
 }
