@@ -3,7 +3,7 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
-var Opcodes = module.exports = {
+var Opcodes = {
     "nop": 0x00,
     "aconst_null": 0x01,
     "iconst_m1": 0x02,
@@ -206,21 +206,26 @@ var Opcodes = module.exports = {
     "goto_w": 0xC8,
     "jsr_w": 0xC9,
     
-    toString: function(opcode) {
-        if (!this._cache) {
+    toString: function(opCode) {
+        if ( !this._cache ) {
             this._cache = new Array(256);
         }
-        if (opcode in this._cache) {
-            return this._cache[opcode]; 
+        if ( this._cache[opCode] ) {
+            return this._cache[opCode]; 
         }
-        for(var name in this) {
-            if (this[name] === opcode) {
-                this._cache[name] = opcode;
-                return name;
+        for(var opName in this) {
+            if (this[opName] === opCode) {
+                return this._cache[opCode] = opName;
             }
         }
         return null;
     }
 };
+
+if ( !global.OPCODES ) {
+    global.OPCODES = Opcodes;
+}
+
+module.exports = global.OPCODES;
 
   
