@@ -37,12 +37,12 @@ Classes.prototype.loadJSFile = function(fileName) {
 Classes.prototype.getEntryPoint = function(className, methodName) {
     methodName = methodName || "main";
     for(var name in this.classes) {
-        var classArea = this.classes[name];
-        if (classArea instanceof ClassArea) {
-            if (!className || (className === classArea.getClassName())) {    
-                if (ACCESS_FLAGS.isPublic(classArea.getAccessFlags())) {
-                    var ms = classArea.getMethods();
-                    var cp = classArea.getConstantPool();
+        var ca = this.classes[name];
+        if (ca instanceof ClassArea) {
+            if (!className || (className === ca.getClassName())) {    
+                if (ACCESS_FLAGS.isPublic(ca.getAccessFlags())) {
+                    var ms = ca.getMethods();
+                    var cp = ca.getConstantPool();
                     for(var i=0; i<ms.length; i++) {
                         if
                         (
@@ -50,7 +50,7 @@ Classes.prototype.getEntryPoint = function(className, methodName) {
                          ACCESS_FLAGS.isStatic(ms[i].access_flags) &&
                          cp[ms[i].name_index].bytes === methodName
                         )
-                        { return new Frame(classArea, ms[i]); }
+                        { return new Frame(ca, ms[i]); }
                     }
                 }
             }
@@ -59,37 +59,34 @@ Classes.prototype.getEntryPoint = function(className, methodName) {
 }
 
 Classes.prototype.getClass = function(className) {
-    var classArea = this.classes[className];
-    if (!classArea) {
-        var fileNameBase = util.format("%s/%s", __dirname, className);
-        if (fs.existsSync(fileNameBase + ".js")) {
-            return this.loadJSFile(fileNameBase + ".js");
-        } else if(fs.existsSync(fileNameBase + ".class")) {
-            return this.loadClassFile(fileNameBase + ".class");
-        } else {
-            var classNotFoundException = this.createNewObject("java/lang/ClassNotFoundException");
-            classNotFoundException["<init>"](util.format("Implementation of the %s class is not found.", className));
-            throw classNotFoundException;
-        }
-    } else {
-        return classArea;
+    var ca = this.classes[className];
+    if (ca) {
+        return ca;
     }
+    var fileName = util.format("%s/%s", __dirname, className);
+    if (fs.existsSync(fileName + ".js")) {
+        return this.loadJSFile(fileName + ".js");
+    }
+    if(fs.existsSync(fileName + ".class")) {
+        return this.loadClassFile(fileName + ".class");
+    }
+    throw new Error(util.format("Implementation of the %s class is not found.", className));
 };
         
         
-Classes.prototype.getStaticField = function(className, fieldName) {
-    var clazz = this.getClass(className);
-    if (clazz instanceof ClassArea) {
-        var fields = clazz.getFields();
-        var cp = clazz.getConstantPool();
+Classes.prototype.getStaticField = function(className, fieldName, classNameStatic) {
+    var ca = this.getClass(className);
+    if (ca instanceof ClassArea) {
+        var fields = ca.getFields();
+        var cp = ca.getConstantPool();
         for(var i=0; i<fields.length; i++) {
             if (cp[fields[i].name_index].bytes === fieldName) {
-                return;
+                return this.getClass(classNameStatic);
             }
         }
         throw new Error(util.format("Static field %s.%s is not found.", className, fieldName));
     } else {
-        return clazz[fieldName];
+        return ca[fieldName];
     }
 };
         

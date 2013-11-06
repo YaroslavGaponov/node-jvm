@@ -18,7 +18,7 @@ var Frame = module.exports = function(classArea, method) {
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
                 this._code = method.attributes[i].info.code;
-                this._exceptionTable = method.attributes[i].info.exception_table;
+                this._exception_table = method.attributes[i].info.exception_table;
                 this._locals = new Array(method.attributes[i].info.max_locals);
                 break;
             }
@@ -1236,7 +1236,6 @@ Frame.prototype.ifnonnull = function(done) {
 
 Frame.prototype.putfield = function(done) {
     var idx = this._read16();
-    
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;    
     var val = this._stack.pop();
     var obj = this._stack.pop();
@@ -1246,7 +1245,6 @@ Frame.prototype.putfield = function(done) {
 
 Frame.prototype.getfield = function(done) {    
     var idx = this._read16();
-    
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var obj = this._stack.pop();
     this._stack.push(obj[fieldName]);
@@ -1257,7 +1255,6 @@ Frame.prototype.getfield = function(done) {
 
 Frame.prototype.new = function(done) {
     var idx = this._read16();
-    
     var className = this._cp[this._cp[idx].name_index].bytes;    
     this._stack.push(CLASSES.createNewObject(className));
     return done();
@@ -1267,7 +1264,9 @@ Frame.prototype.getstatic = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
     var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
-    this._stack.push(CLASSES.getStaticField(className, staticField));
+    var classNameStatic = this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes;
+    classNameStatic = classNameStatic.substring(1, classNameStatic.length - 1);
+    this._stack.push(CLASSES.getStaticField(className, staticField, classNameStatic));
     return done();
 }
 
@@ -1530,22 +1529,22 @@ Frame.prototype.checkcast = function(done) {
 
 Frame.prototype.athrow = function(done) {
     var ex = this._stack.pop();
-    var defaultHandler = null;
-    for(var i=0; i<this._exceptionTable.length; i++) {
-        if (this._ip >= this._exceptionTable[i].start_pc && this._ip <= this._exceptionTable[i].end_pc) {
-            if (this._exceptionTable[i].catch_type === 0) {
-                defaultHandler = this._exceptionTable[i].handler_pc;             
+    var def = null;
+    for(var i=0; i<this._exception_table.length; i++) {
+        if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
+            if (this._exception_table[i].catch_type === 0) {
+                def = this._exception_table[i].handler_pc;             
             } else {
-                var exClassName = this._cp[this._cp[this._exceptionTable[i].catch_type].name_index].bytes;
+                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
                 if (exClassName  === ex.constructor.getClassName()) {
-                    this._ip = this._exceptionTable[i].handler_pc;
+                    this._ip = this._exception_table[i].handler_pc;
                     return done();
                 }
             }
         }
     }
-    if (defaultHandler !== null) {
-        this._ip = defaultHandler;
+    if (def !== null) {
+        this._ip = def;
         return done();        
     }
     throw ex;   
