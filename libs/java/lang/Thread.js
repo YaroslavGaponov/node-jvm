@@ -6,6 +6,7 @@
 var util = require("util");
 var Object = require("./Object.js");
 var Frame = require("./../../frame.js");
+var Threads = require("./../../threads.js");
 
 var STATE = {
     NEW: "NEW",
@@ -35,13 +36,12 @@ Thread.getClassName = function() {
 Thread.prototype["<init>"] = function(instance) {
     this._instance = instance;
     this._state = STATE.NEW;
-    this._join = false;
+    this._id = Threads.getInstance().add();
     return this;
 }
 
 Thread.prototype["join"] = function() {
-    this._join = true;
-    process.JVM.Threads++;
+    Threads.getInstance().join(this._id );
 }
 
 Thread.prototype["start"] = function() {
@@ -50,15 +50,13 @@ Thread.prototype["start"] = function() {
     if (this._instance["run"] instanceof Frame) {
         this._instance["run"].run([this._instance], function() {
             self._state = STATE.TERMINATED;
-            if (self._join) {
-                process.JVM.Threads--;
-            }
+            Threads.getInstance().remove(self._id);
         });
     } else {
         self._instance["run"]();
         self._state = STATE.TERMINATED;
         if (self._join) {
-            process.JVM.Threads--;
+            Threads.getInstance().remove(self._id);
         }
     }
 };

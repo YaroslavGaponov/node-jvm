@@ -7,23 +7,19 @@ var util = require("util");
 var fs = require("fs");
 var path = require("path");
 
-var Opcodes = require("./opcodes.js");
-var Loader = require("./loader.js");
-
+var Classes = require("./classes");
+var Threads = require("./threads");
+var tick = require("./util/tick");
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
-        process.JVM = {
-            Loader: new Loader(),
-            Threads: 1
-        }
     } else {
         return new JVM();
     }
 }
 
 JVM.prototype.loadClassFile = function(fileName) {
-    return process.JVM.Loader.loadClassFile(fileName);
+    return Classes.getInstance().loadClassFile(fileName);
 }
 
 JVM.prototype.loadClassFiles = function(dirName) {
@@ -43,21 +39,24 @@ JVM.prototype.loadClassFiles = function(dirName) {
 }
 
 JVM.prototype.loadJSFile = function(fileName) {
-    return process.JVM.Loader.loadJSFile(fileName);
+    return Classes.getInstance().loadJSFile(fileName);
 }
 
 
 JVM.prototype.run = function() {
-    var entryPointFrame = process.JVM.Loader.getEntryPointFrame();
+    var entryPoint = Classes.getInstance().getEntryPoint();
     
-    if (!entryPointFrame) {
+    if (!entryPoint) {
         throw new Error("Entry point method is not found.");
     }
+    
+    Threads.getInstance().add("main");
 
-    entryPointFrame.run(arguments, function(code) {
+    entryPoint.run(arguments, function(code) {
+        Threads.getInstance().remove("main");
         var halt = function() {
-            setImmediate(function() {
-                if (process.JVM.Threads === 1) {
+            tick(function() {
+                if (Threads.getInstance().isEmptyWaitList()) {
                     process.exit(code);
                 } else {
                     halt();
