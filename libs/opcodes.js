@@ -222,10 +222,10 @@ var Opcodes = {
     }
 };
 
-if ( !global.OPCODES ) {
-    global.OPCODES = Opcodes;
-}
 
-module.exports = global.OPCODES;
-
-  
+module.exports = (function() {
+    if ( !global.OPCODES ) {
+        global.OPCODES = Opcodes;
+    }
+    return global.OPCODES;
+})();
