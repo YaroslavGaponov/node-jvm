@@ -226,12 +226,13 @@ var OPCODES = {
 module.exports.initialize = function() {
     if ( !global.OPCODES ) {
         global.OPCODES = OPCODES;
+        for(var i=0; i<255; i++) {
+            OPCODES.toString(i);
+        }
     }
 };
 
 module.exports.getInstance = function() {
-    if ( !global.OPCODES ) {
-        global.OPCODES = OPCODES;
-    }
+    initialize();
     return global.OPCODES;
 };

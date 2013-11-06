@@ -8,7 +8,3 @@ module.exports.initialize = function() {
         global.TICK = setImmediate || process.nextTick;
     }
 }
-
-module.exports.getTick = function() {
-    return setImmediate || process.nextTick;
-}

@@ -166,9 +166,7 @@ module.exports.initialize = function() {
 
 
 module.exports.getInstance = function() {
-    if (!global.CLASSES) {
-        global.CLASSES = new Classes();
-    }
+    initialize();
     return global.CLASSES;
 }
 

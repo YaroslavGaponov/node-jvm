@@ -48,9 +48,7 @@ module.exports.initialize = function() {
 }
 
 module.exports.getInstance = function() {
-    if ( ! global.THREADS ) {
-        global.THREADS = new Threads();
-    }
+    initialize();
     return global.THREADS;
 }
 
