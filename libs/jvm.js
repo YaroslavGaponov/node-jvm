@@ -7,10 +7,10 @@ var util = require("util");
 var fs = require("fs");
 var path = require("path");
 
-require("./opcodes").initialize();
-require("./classes").initialize();
-require("./threads").initialize();
-require("./tick").initialize();
+require("./opcodes").globalize();
+require("./classes").globalize();
+require("./threads").globalize();
+require("./tick").globalize();
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {

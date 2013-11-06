@@ -223,7 +223,7 @@ var OPCODES = {
 };
 
 
-module.exports.initialize = function() {
+module.exports.globalize = function() {
     if ( !global.OPCODES ) {
         global.OPCODES = OPCODES;
         for(var i=0; i<255; i++) {
@@ -233,6 +233,6 @@ module.exports.initialize = function() {
 };
 
 module.exports.getInstance = function() {
-    initialize();
+    globalize();
     return global.OPCODES;
 };

@@ -41,14 +41,14 @@ Threads.prototype.isEmpty = function() {
     return this.list.length === 0;
 }
 
-module.exports.initialize = function() {
+module.exports.globalize = function() {
     if ( ! global.THREADS ) {
         global.THREADS = new Threads();
     }
 }
 
 module.exports.getInstance = function() {
-    initialize();
+    globalize();
     return global.THREADS;
 }
 
