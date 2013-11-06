@@ -65,9 +65,9 @@ JVM.prototype.run = function() {
     
     THREADS.add("main");
     entryPoint.run(arguments, function(code) {
+        THREADS.remove("main");
         var exit = function() {
             TICK(function() {
-                THREADS.remove("main");
                 if (THREADS.length() === 0) {
                     process.exit(code);
                 } else {
