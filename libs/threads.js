@@ -3,53 +3,27 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
-var Thread = function(id) {
-    this.id = id;
-}
 
-var Threads = function() {
-    this.threads = {};
-    this.list = [];
+var Threads = module.exports = function() {
+    this.threads = [];
 }
 
 Threads.prototype.add = function(id) {
-    var id = id || Object.keys(this.threads).length;
-    this.threads[id] = new Thread(id);
+    id = id || this.threads.length;
+    this.threads.push(id);
     return id;
 }
 
 Threads.prototype.remove = function(id) {
-    delete this.threads[id];
-    var idx = this.list.indexOf(id);
-    if ( idx > -1 ) {
-        this.list.splice(idx, 1);
+    var idx = this.threads.indexOf(id);
+    if (idx > -1) {
+        this.threads.splice(idx, 1);
     }
 }
 
-Threads.prototype.join = function(id) {
-    var idx = this.list.indexOf(id);
-    if ( idx === -1 ) {
-        this.list.push(id);
-    }
+Threads.prototype.length = function() {
+    return this.threads.length;
 }
 
-Threads.prototype.list = function() {
-    return Object.keys(this.threads);
-}
-
-Threads.prototype.isEmpty = function() {
-    return this.list.length === 0;
-}
-
-module.exports.globalize = function() {
-    if ( ! global.THREADS ) {
-        global.THREADS = new Threads();
-    }
-}
-
-module.exports.getInstance = function() {
-    globalize();
-    return global.THREADS;
-}
 
 

@@ -11,7 +11,7 @@ var Frame = require("./frame.js");
 
 var ACCESS_FLAGS = require("./classfile/accessflags.js");
 
-var Classes = function() {
+var Classes = module.exports = function() {
     if (this instanceof Classes) {
         this.classes = {};
     } else  {
@@ -157,17 +157,4 @@ Classes.prototype.createNewObject = function(className) {
         return new clazz();
     }
 }
-
-module.exports.globalize = function() {
-    if (!global.CLASSES) {
-        global.CLASSES = new Classes();
-    }
-}
-
-
-module.exports.getInstance = function() {
-    globalize();
-    return global.CLASSES;
-}
-
 

@@ -37,9 +37,6 @@ Thread.prototype["<init>"] = function(instance) {
     return this;
 }
 
-Thread.prototype["join"] = function() {
-    THREADS.join(this._id );
-}
 
 Thread.prototype["start"] = function() {
     var self = this;

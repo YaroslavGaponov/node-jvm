@@ -7,13 +7,27 @@ var util = require("util");
 var fs = require("fs");
 var path = require("path");
 
-require("./opcodes").globalize();
-require("./classes").globalize();
-require("./threads").globalize();
-require("./tick").globalize();
+var globalizer = require("./util/globalizer");
+
+var Classes = require("./classes");
+var Threads = require("./threads");
+
+var OPCODES = require("./opcodes");
+
+var tick = function(fn) {
+    if (THREADS.length === 1) {
+        fn();
+    } else {
+        (setImmediate || process.nextTick)(fn);
+    }
+}
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
+        globalizer.add("CLASSES", new Classes());
+        globalizer.add("THREADS", new Threads());
+        globalizer.add("OPCODES", OPCODES);
+        globalizer.add("TICK", tick);
     } else {
         return new JVM();
     }
@@ -51,10 +65,10 @@ JVM.prototype.run = function() {
     
     THREADS.add("main");
     entryPoint.run(arguments, function(code) {
-        THREADS.remove("main");
         var exit = function() {
-            TICK (function() {
-                if (THREADS.isEmpty()) {
+            TICK(function() {
+                THREADS.remove("main");
+                if (THREADS.length() === 0) {
                     process.exit(code);
                 } else {
                     exit();

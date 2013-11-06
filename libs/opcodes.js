@@ -3,7 +3,7 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
-var OPCODES = {
+var OPCODES = module.exports = {
     "nop": 0x00,
     "aconst_null": 0x01,
     "iconst_m1": 0x02,
@@ -220,19 +220,4 @@ var OPCODES = {
         }
         return null;
     }
-};
-
-
-module.exports.globalize = function() {
-    if ( !global.OPCODES ) {
-        global.OPCODES = OPCODES;
-        for(var i=0; i<255; i++) {
-            OPCODES.toString(i);
-        }
-    }
-};
-
-module.exports.getInstance = function() {
-    globalize();
-    return global.OPCODES;
 };

@@ -18,10 +18,6 @@ public class Main {
 		stenThread.start();
 		nikaThread.start();
 
-		mikeThread.join();
-		stenThread.join();
-		nikaThread.join();
-
 		System.out.println("Done.");
 	}
 
