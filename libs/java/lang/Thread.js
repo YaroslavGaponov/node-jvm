@@ -36,12 +36,12 @@ Thread.getClassName = function() {
 Thread.prototype["<init>"] = function(instance) {
     this._instance = instance;
     this._state = STATE.NEW;
-    this._id = Threads.getInstance().add();
+    this._id = THREADS.add();
     return this;
 }
 
 Thread.prototype["join"] = function() {
-    Threads.getInstance().join(this._id );
+    THREADS.join(this._id );
 }
 
 Thread.prototype["start"] = function() {
@@ -50,13 +50,13 @@ Thread.prototype["start"] = function() {
     if (this._instance["run"] instanceof Frame) {
         this._instance["run"].run([this._instance], function() {
             self._state = STATE.TERMINATED;
-            Threads.getInstance().remove(self._id);
+            THREADS.remove(self._id);
         });
     } else {
         self._instance["run"]();
         self._state = STATE.TERMINATED;
         if (self._join) {
-            Threads.getInstance().remove(self._id);
+            THREADS.remove(self._id);
         }
     }
 };

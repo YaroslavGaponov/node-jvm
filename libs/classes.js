@@ -158,7 +158,7 @@ Classes.prototype.createNewObject = function(className) {
     }
 }
 
-module.exports.getInstance = function() {
+module.exports.initialize = function() {
     if (!global.CLASSES) {
         global.CLASSES = new Classes();
     }

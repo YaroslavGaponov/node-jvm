@@ -9,7 +9,7 @@ var Thread = function(id) {
 
 var Threads = function() {
     this.threads = {};
-    this.wait_list = [];
+    this.list = [];
 }
 
 Threads.prototype.add = function(id) {
@@ -20,16 +20,16 @@ Threads.prototype.add = function(id) {
 
 Threads.prototype.remove = function(id) {
     delete this.threads[id];
-    var idx = this.wait_list.indexOf(id);
+    var idx = this.list.indexOf(id);
     if ( idx > -1 ) {
-        this.wait_list.splice(idx, 1);
+        this.list.splice(idx, 1);
     }
 }
 
 Threads.prototype.join = function(id) {
-    var idx = this.wait_list.indexOf(id);
+    var idx = this.list.indexOf(id);
     if ( idx === -1 ) {
-        this.wait_list.push(id);
+        this.list.push(id);
     }
 }
 
@@ -38,14 +38,10 @@ Threads.prototype.list = function() {
 }
 
 Threads.prototype.isEmpty = function() {
-    return this.list().length === 0;
+    return this.list.length === 0;
 }
 
-Threads.prototype.isEmptyWaitList = function() {
-    return this.wait_list.length === 0;
-}
-
-module.exports.getInstance = function() {
+module.exports.initialize = function() {
     if ( ! global.THREADS ) {
         global.THREADS = new Threads();
     }

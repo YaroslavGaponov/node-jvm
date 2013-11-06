@@ -5,14 +5,11 @@
 
 var util = require("util");
 
-
-var Classes = require("./classes.js");
 var Numeric = require("./util/numeric.js");
 var Signature = require("./classfile/signature.js");
 
 var tick = require("./util/tick");
 
-var OPCODES = require("./opcodes.js");
 var TAGS = require("./classfile/tags.js");
 var ATTRIBUTE_TYPES = require("./classfile/attributetypes.js");
 
@@ -1268,7 +1265,7 @@ Frame.prototype.new = function(done) {
     var idx = this._read16();
     
     var className = this._cp[this._cp[idx].name_index].bytes;    
-    this._stack.push(Classes.getInstance().createNewObject(className));
+    this._stack.push(CLASSES.createNewObject(className));
     return done();
 }
 
@@ -1276,7 +1273,7 @@ Frame.prototype.getstatic = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
     var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
-    this._stack.push(Classes.getInstance().getStaticField(className, staticField));
+    this._stack.push(CLASSES.getStaticField(className, staticField));
     return done();
 }
 
@@ -1284,7 +1281,7 @@ Frame.prototype.putstatic = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
     var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
-    var clazz = Classes.getInstance().getClass(className);
+    var clazz = CLASSES.getClass(className);
     clazz[staticField] = this._stack.pop();
     return done();
 }
@@ -1308,7 +1305,7 @@ Frame.prototype.invokestatic = function(done) {
         }
     }
     
-    var method = Classes.getInstance().getStaticMethod(className, methodName, signature);
+    var method = CLASSES.getStaticMethod(className, methodName, signature);
     
     if (method instanceof Frame) {
         method.run(args, function(res) {
@@ -1348,7 +1345,7 @@ Frame.prototype.invokevirtual = function(done) {
 
     
     var instance = this._stack.pop();
-    var method = Classes.getInstance().getMethod(className, methodName, signature);
+    var method = CLASSES.getMethod(className, methodName, signature);
       
     if (method instanceof Frame) {
         args.unshift(instance);
@@ -1388,7 +1385,7 @@ Frame.prototype.invokespecial = function(done) {
 
 
     var instance = this._stack.pop();
-    var ctor = Classes.getInstance().getMethod(className, methodName, signature);
+    var ctor = CLASSES.getMethod(className, methodName, signature);
     
     if (ctor instanceof Frame) {
         args.unshift(instance);

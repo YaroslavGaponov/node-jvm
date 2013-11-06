@@ -223,9 +223,9 @@ var Opcodes = {
 };
 
 
-module.exports = (function() {
+module.exports.initialize = function() {
     if ( !global.OPCODES ) {
         global.OPCODES = Opcodes;
     }
     return global.OPCODES;
-})();
+};
