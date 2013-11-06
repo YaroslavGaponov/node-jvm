@@ -14,14 +14,17 @@ var Threads = require("./threads");
 
 var OPCODES = require("./opcodes");
 
-var tick = function(fn) {
+var _tick = function(fn) {
     if (++ TICK_COUNT > 50) {
         TICK_COUNT = 0;
         (setImmediate || process.nextTick)(fn);
     } else {
         fn();
     }
+}
 
+var _yield = function() {
+    TICK_COUNT = Number.MAX_VALUE;
 }
 
 var JVM = module.exports = function() {
@@ -29,8 +32,9 @@ var JVM = module.exports = function() {
         globalizer.add("CLASSES", new Classes());
         globalizer.add("THREADS", new Threads());
         globalizer.add("OPCODES", OPCODES);
-        globalizer.add("TICK", tick);
+        globalizer.add("TICK", _tick);
         globalizer.add("TICK_COUNT", 0);
+        globalizer.add("YIELD", _yield);
     } else {
         return new JVM();
     }
