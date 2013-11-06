@@ -6,7 +6,6 @@
 var util = require("util");
 var Object = require("./Object.js");
 var Frame = require("./../../frame.js");
-var Threads = require("./../../threads.js");
 
 var STATE = {
     NEW: "NEW",
@@ -19,8 +18,6 @@ var STATE = {
 
 var Thread = module.exports = function() {
     if (this instanceof Thread) {
-        this._instance = null;
-        this._state = STATE.NEW;
     } else {
         return new Thread();
     }

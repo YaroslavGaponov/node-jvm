@@ -7,13 +7,13 @@ var util = require("util");
 var fs = require("fs");
 var path = require("path");
 
-var tick = require("./util/tick");
+require("./opcodes").initialize();
+require("./classes").initialize();
+require("./threads").initialize();
+require("./tick").initialize();
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
-        require("./opcodes").initialize();
-        require("./classes").initialize();
-        require("./threads").initialize();
     } else {
         return new JVM();
     }
@@ -45,25 +45,23 @@ JVM.prototype.loadJSFile = function(fileName) {
 
 JVM.prototype.run = function() {
     var entryPoint = CLASSES.getEntryPoint();
-    
     if (!entryPoint) {
         throw new Error("Entry point method is not found.");
     }
     
     THREADS.add("main");
-
     entryPoint.run(arguments, function(code) {
         THREADS.remove("main");
-        var halt = function() {
-            tick(function() {
+        var exit = function() {
+            TICK (function() {
                 if (THREADS.isEmpty()) {
                     process.exit(code);
                 } else {
-                    halt();
+                    exit();
                 }
             });
         };
-        halt();
+        exit();
     });
 }
 

@@ -13,10 +13,10 @@ Clazz.getClassName = function() {
 }
  
 Clazz.forName = function(className) {
-    return new Clazz(className, process.JVM.Loader.getClass(className));
+    return new Clazz(className, CLASSES.getClass(className));
 }
 
 Clazz.prototype.newInstance = function() {
-    return process.JVM.Loader.createNewObject(this._className);
+    return CLASSES.createNewObject(this._className);
 
 }

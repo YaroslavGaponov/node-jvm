@@ -5,26 +5,21 @@
 
 var util = require("util");
 
-var Numeric = require("./util/numeric.js");
-var Signature = require("./classfile/signature.js");
+var Numeric = require("./util/numeric");
+var Signature = require("./classfile/signature");
 
-var tick = require("./util/tick");
-
-var TAGS = require("./classfile/tags.js");
-var ATTRIBUTE_TYPES = require("./classfile/attributetypes.js");
+var TAGS = require("./classfile/tags");
+var ATTRIBUTE_TYPES = require("./classfile/attributetypes");
 
 var Frame = module.exports = function(classArea, method) {
     if (this instanceof Frame) {
-        
-        this._classArea = classArea;
-        this._method = method;
         this._cp = classArea.getConstantPool();
         
         for(var i=0; i<method.attributes.length; i++) {
             if (method.attributes[i].info.type === ATTRIBUTE_TYPES.Code) {
                 this._code = method.attributes[i].info.code;
                 this._exceptionTable = method.attributes[i].info.exception_table;
-                this._maxLocals = method.attributes[i].info.max_locals;
+                this._locals = new Array(method.attributes[i].info.max_locals);
                 break;
             }
         }
@@ -51,7 +46,6 @@ Frame.prototype.run = function(args, done) {
     
     this._ip = 0;
     this._stack = [];
-    this._locals = new Array(this._maxLocals);
     this._widened = false;
        
     for(var i=0; i<args.length; i++) {
@@ -60,7 +54,7 @@ Frame.prototype.run = function(args, done) {
     
     var step = function() {
         
-        tick(function() {
+        TICK(function() {
             var opCode = self._read8()
             
             switch (opCode) {
@@ -1059,7 +1053,7 @@ Frame.prototype.arraylength = function(done) {
 }
 
 Frame.prototype.if_icmpeq = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 === ref2 ? jmp : this._ip;
@@ -1067,7 +1061,7 @@ Frame.prototype.if_icmpeq = function(done) {
 }
 
 Frame.prototype.if_icmpne = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 !== ref2 ? jmp : this._ip;
@@ -1075,7 +1069,7 @@ Frame.prototype.if_icmpne = function(done) {
 }
 
 Frame.prototype.if_icmpgt = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 < ref2 ? jmp : this._ip;
@@ -1083,19 +1077,19 @@ Frame.prototype.if_icmpgt = function(done) {
 }
 
 Frame.prototype.if_icmple = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() >= this._stack.pop() ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.if_icmplt = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() > this._stack.pop() ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.if_icmpge = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 <= ref2 ? jmp : this._ip;
@@ -1103,7 +1097,7 @@ Frame.prototype.if_icmpge = function(done) {
 }
 
 Frame.prototype.if_acmpeq = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 === ref2 ? jmp : this._ip;
@@ -1111,7 +1105,7 @@ Frame.prototype.if_acmpeq = function(done) {
 }
 
 Frame.prototype.if_acmpne = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());                                
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());                                
     var ref1 = this._stack.pop();
     var ref2 = this._stack.pop();
     this._ip = ref1 !== ref2 ? jmp : this._ip;
@@ -1119,37 +1113,37 @@ Frame.prototype.if_acmpne = function(done) {
 }
 
 Frame.prototype.ifne = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() !== 0 ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.ifeq = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() === 0 ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.iflt = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() < 0 ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.ifge = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() >= 0 ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.ifgt = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() > 0 ? jmp : this._ip;
     return done();
 }
 
 Frame.prototype.ifle = function(done) {
-    var jmp = this._ip - 1 + Numeric.getSInt(this._read16());
+    var jmp = this._ip - 1 + Numeric.getInt(this._read16());
     this._ip = this._stack.pop() <= 0 ? jmp : this._ip;
     return done();
 }
@@ -1215,19 +1209,19 @@ Frame.prototype.f2l = function(done) {
 }
 
 Frame.prototype.goto = function(done) {
-    this._ip += Numeric.getSInt(this._read16()) - 1;
+    this._ip += Numeric.getInt(this._read16()) - 1;
     return done();
 }
 
 Frame.prototype.goto_w = function(done) {
-    this._ip += Numeric.getSInt(this._read32()) - 1;
+    this._ip += Numeric.getInt(this._read32()) - 1;
     return done();
 }
 
 Frame.prototype.ifnull = function(done) {
     var ref = this._stack.pop();
     if (!ref) {
-        this._ip += Numeric.getSInt(this._read16()) - 1;
+        this._ip += Numeric.getInt(this._read16()) - 1;
     }
     return done();
 }
@@ -1235,7 +1229,7 @@ Frame.prototype.ifnull = function(done) {
 Frame.prototype.ifnonnull = function(done) {
     var ref = this._stack.pop();
     if (!!ref) {
-        this._ip += Numeric.getSInt(this._read16()) - 1;
+        this._ip += Numeric.getInt(this._read16()) - 1;
     }
     return done();
 }
@@ -1482,7 +1476,7 @@ Frame.prototype.tableswitch = function(done) {
         jmp = this._read32();        
     }    
     
-    this._ip = startip - 1 + Numeric.getSInt(jmp);
+    this._ip = startip - 1 + Numeric.getInt(jmp);
     
     return done();
 }
@@ -1511,7 +1505,7 @@ Frame.prototype.lookupswitch = function(done) {
             }
         }
       
-    this._ip = startip - 1 + Numeric.getSInt(jmp);
+    this._ip = startip - 1 + Numeric.getInt(jmp);
     
     return done();
 }

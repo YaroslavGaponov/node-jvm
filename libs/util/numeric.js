@@ -3,7 +3,7 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
-module.exports.getSByte = function(v) {
+module.exports.getByte = function(v) {
     n = parseInt(v, 10) & 0xff;
     if (n > 0x7F) {
         n = -((n & 0x7F) ^ 0x7F) - 1;
@@ -11,7 +11,7 @@ module.exports.getSByte = function(v) {
     return n
 }
 
-module.exports.getSInt = function(v) {
+module.exports.getInt = function(v) {
     n = parseInt(v, 10) & 0xffff;
     if (n > 0x7FFF) {
         n = -((n & 0x7FFF) ^ 0x7FFF) - 1;
@@ -27,5 +27,4 @@ module.exports.getLong = function(bytes) {
     }
     return l;
 }
-
 
