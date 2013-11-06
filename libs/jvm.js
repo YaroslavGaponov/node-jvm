@@ -15,10 +15,21 @@ var Threads = require("./threads");
 var OPCODES = require("./opcodes");
 
 var tick = function(fn) {
+    var async = true;
+    
     if (THREADS.length === 1) {
-        fn();
-    } else {
+        if (TICKS < 500) {
+            async = false;
+            TICKS++;
+        } else {
+            TICKS = 0;
+        }
+    }
+    
+    if (async) {
         (setImmediate || process.nextTick)(fn);
+    } else {
+        fn();
     }
 }
 
@@ -28,6 +39,7 @@ var JVM = module.exports = function() {
         globalizer.add("THREADS", new Threads());
         globalizer.add("OPCODES", OPCODES);
         globalizer.add("TICK", tick);
+        globalizer.add("TICKS", 0);
     } else {
         return new JVM();
     }
@@ -68,7 +80,7 @@ JVM.prototype.run = function() {
         THREADS.remove("main");
         var exit = function() {
             TICK(function() {
-                if (THREADS.length() === 0) {
+                if (THREADS.length === 0) {
                     process.exit(code);
                 } else {
                     exit();
