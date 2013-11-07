@@ -14,32 +14,32 @@ var LEVELS = {
     }
 };
 
-var Logger = module.exports = function(level) {
+var Logger = module.exports = function(levels) {
     if (this instanceof Logger) {
-        this.level = level || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.INFO );
+        this.levels = levels || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.INFO );
     } else {
-        return new Logger(level);
+        return new Logger(levels);
     }
 }
 
-Logger.prototype.setLogLevel = function(level) {
-    this.level = level;
+Logger.prototype.setLogLevel = function(levels) {
+    this.levels = levels;
 }
 
 Logger.prototype.debug = function(msg) {
-    if (LEVELS.check(this.level, LEVELS.DEBUG)) {
+    if (LEVELS.check(this.levels, LEVELS.DEBUG)) {
         util.debug(msg);
     }
 }
 
 Logger.prototype.error = function(msg) {
-    if (LEVELS.check(this.level, LEVELS.ERROR)) {
+    if (LEVELS.check(this.levels, LEVELS.ERROR)) {
         util.error(msg);
     }
 }
 
 Logger.prototype.info = function(msg) {
-    if (LEVELS.check(this.level, LEVELS.PRINT)) {
+    if (LEVELS.check(this.levels, LEVELS.PRINT)) {
         util.print("INFO: " + msg);
     }
 }
