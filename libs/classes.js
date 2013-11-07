@@ -84,10 +84,12 @@ Classes.prototype.getStaticField = function(className, fieldName, classNameStati
                 return this.getClass(classNameStatic);
             }
         }
-        throw new Error(util.format("Static field %s.%s is not found.", className, fieldName));
     } else {
-        return ca[fieldName];
+        if (fieldName in ca) {
+           return ca[fieldName];
+        }
     }
+    throw new Error(util.format("Static field %s.%s is not found.", className, fieldName));
 };
         
         
@@ -103,10 +105,12 @@ Classes.prototype.getStaticMethod = function(className, methodName, signature) {
                 }
             }
         }
-        throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
     } else {
-        return clazz[methodName];
+        if (methodName in clazz) {
+            return clazz[methodName];
+        }
     }
+    throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
 };
         
 Classes.prototype.getMethod = function(className, methodName, signature) {
@@ -121,11 +125,13 @@ Classes.prototype.getMethod = function(className, methodName, signature) {
                 }
             }
         }
-        throw new Error(util.format("Method %s.%s is not found.", className, methodName));
     } else {
         var o = new clazz();
-        return o[methodName];
+        if (methodName in o) {
+           return o[methodName];
+        }
     }
+    throw new Error(util.format("Method %s.%s is not found.", className, methodName));
 };
         
 Classes.prototype.createNewObject = function(className) {
