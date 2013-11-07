@@ -12,12 +12,14 @@ var globalizer = require("./util/globalizer");
 var Classes = require("./classes");
 var Threads = require("./threads");
 var Scheduler = require("./scheduler");
+var Logger = require("./logger");
 
 var OPCODES = require("./opcodes");
 
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
+        globalizer.add("LOG", new Logger());
         globalizer.add("CLASSES", new Classes());
         globalizer.add("THREADS", new Threads());
         globalizer.add("SCHEDULER", new Scheduler(100));

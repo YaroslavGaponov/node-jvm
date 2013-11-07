@@ -20,7 +20,7 @@ var Classes = module.exports = function() {
 }
 
 Classes.prototype.loadClassFile = function(fileName) {
-    util.debug("JVM: loading " + fileName + " ...");
+    LOG.debug("loading " + fileName + " ...");
     var bytes = fs.readFileSync(fileName);
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;
@@ -28,7 +28,7 @@ Classes.prototype.loadClassFile = function(fileName) {
 }
 
 Classes.prototype.loadJSFile = function(fileName) {
-    util.debug("JVM: loading " + fileName + " ...");
+    LOG.debug("loading " + fileName + " ...");
     var classArea = require(fileName);
     this.classes[classArea.getClassName()] = classArea;
     return classArea;
