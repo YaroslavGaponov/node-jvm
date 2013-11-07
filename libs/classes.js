@@ -14,6 +14,7 @@ var ACCESS_FLAGS = require("./classfile/accessflags.js");
 var Classes = module.exports = function() {
     if (this instanceof Classes) {
         this.classes = {};
+        this.staticFields = {};
     } else  {
         return new Classes();
     }
@@ -24,6 +25,13 @@ Classes.prototype.loadClassFile = function(fileName) {
     var bytes = fs.readFileSync(fileName);
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;
+    
+    var method = this.getStaticMethod(classArea.getClassName(), "<clinit>", "()V");
+    if (method instanceof Frame) {
+        LOG.debug("fire " + classArea.getClassName() + ".<clinit> ...");
+        method.run([], function() {});
+    }
+    
     return classArea;
 }
 
@@ -72,27 +80,15 @@ Classes.prototype.getClass = function(className) {
     }
     throw new Error(util.format("Implementation of the %s class is not found.", className));
 };
-        
-        
-Classes.prototype.getStaticField = function(className, fieldName, classNameStatic) {
-    var ca = this.getClass(className);
-    if (ca instanceof ClassArea) {
-        var fields = ca.getFields();
-        var cp = ca.getConstantPool();
-        for(var i=0; i<fields.length; i++) {
-            if (cp[fields[i].name_index].bytes === fieldName) {
-                return this.getClass(classNameStatic);
-            }
-        }
-    } else {
-        if (fieldName in ca) {
-           return ca[fieldName];
-        }
-    }
-    throw new Error(util.format("Static field %s.%s is not found.", className, fieldName));
-};
-        
-        
+
+Classes.prototype.getStaticField = function(className, fieldName) {
+    return this.staticFields[className + '.' + fieldName]; 
+}
+
+Classes.prototype.setStaticField = function(className, fieldName, value) {
+    this.staticFields[className + '.' + fieldName] = value;   
+}
+
 Classes.prototype.getStaticMethod = function(className, methodName, signature) {
     var clazz = this.getClass(className);  
     if(clazz instanceof ClassArea) {
@@ -110,7 +106,7 @@ Classes.prototype.getStaticMethod = function(className, methodName, signature) {
             return clazz[methodName];
         }
     }
-    throw new Error(util.format("Static method %s.%s is not found.", className, methodName));
+    return null;
 };
         
 Classes.prototype.getMethod = function(className, methodName, signature) {
@@ -131,7 +127,7 @@ Classes.prototype.getMethod = function(className, methodName, signature) {
            return o[methodName];
         }
     }
-    throw new Error(util.format("Method %s.%s is not found.", className, methodName));
+    return null;
 };
         
 Classes.prototype.createNewObject = function(className) {

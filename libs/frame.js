@@ -1260,22 +1260,19 @@ Frame.prototype.new = function(done) {
     return done();
 }
 
-Frame.prototype.getstatic = function(done) {
+Frame.prototype.getstatic = function(done) {    
     var idx = this._read16();
     var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
-    var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
-    var classNameStatic = this._cp[this._cp[this._cp[idx].name_and_type_index].signature_index].bytes;
-    classNameStatic = classNameStatic.substring(1, classNameStatic.length - 1);
-    this._stack.push(CLASSES.getStaticField(className, staticField, classNameStatic));
+    var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    this._stack.push(CLASSES.getStaticField(className, fieldName));
     return done();
 }
 
 Frame.prototype.putstatic = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[this._cp[idx].class_index].name_index].bytes;
-    var staticField = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
-    var clazz = CLASSES.getClass(className);
-    clazz[staticField] = this._stack.pop();
+    var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
+    CLASSES.setStaticField(className, fieldName, this._stack.pop());
     return done();
 }
 
