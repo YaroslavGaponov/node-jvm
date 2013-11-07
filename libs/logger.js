@@ -8,34 +8,38 @@ var util = require("util");
 var LEVELS = {
     DEBUG: 1<<0,
     ERROR: 1<<1,
-    PRINT: 1<<2,
+    INFO: 1<<2,
     check: function(levels, level) {
         return (levels & level) === level;
     }
 };
 
-var Logger = module.exports = function(levels) {
+var Logger = module.exports = function(level) {
     if (this instanceof Logger) {
-        this.levels = levels || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.PRINT );
+        this.level = level || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.INFO );
     } else {
-        return new Logger(levels);
+        return new Logger(level);
     }
 }
 
+Logger.prototype.setLogLevel = function(level) {
+    this.level = level;
+}
+
 Logger.prototype.debug = function(msg) {
-    if (LEVELS.check(this.levels, LEVELS.DEBUG)) {
+    if (LEVELS.check(this.level, LEVELS.DEBUG)) {
         util.debug(msg);
     }
 }
 
 Logger.prototype.error = function(msg) {
-    if (LEVELS.check(this.levels, LEVELS.ERROR)) {
+    if (LEVELS.check(this.level, LEVELS.ERROR)) {
         util.error(msg);
     }
 }
 
-Logger.prototype.print = function(msg) {
-    if (LEVELS.check(this.levels, LEVELS.PRINT)) {
-        util.print(msg);
+Logger.prototype.info = function(msg) {
+    if (LEVELS.check(this.level, LEVELS.PRINT)) {
+        util.print("INFO: " + msg);
     }
 }

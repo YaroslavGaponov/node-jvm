@@ -22,11 +22,19 @@ var JVM = module.exports = function() {
         globalizer.add("LOG", new Logger());
         globalizer.add("CLASSES", new Classes());
         globalizer.add("THREADS", new Threads());
-        globalizer.add("SCHEDULER", new Scheduler(100));
+        globalizer.add("SCHEDULER", new Scheduler());
         globalizer.add("OPCODES", OPCODES);
     } else {
         return new JVM();
     }
+}
+
+JVM.prototype.setLogLevel = function(level) {
+    LOG.setLogLevel(level);
+}
+
+JVM.prototype.setSchedulerMaxTicks = function(mticks) {
+    SCHEDULER.setMaxTicks(mticks);
 }
 
 JVM.prototype.loadClassFile = function(fileName) {
