@@ -1,6 +1,6 @@
 {
   "name": "node-jvm",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "jvm",
   "main": "index.js",
   "directories": {

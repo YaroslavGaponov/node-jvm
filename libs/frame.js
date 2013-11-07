@@ -1248,7 +1248,6 @@ Frame.prototype.getfield = function(done) {
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var obj = this._stack.pop();
     this._stack.push(obj[fieldName]);
-
     return done();
 }
 
