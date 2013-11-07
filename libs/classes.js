@@ -26,10 +26,10 @@ Classes.prototype.loadClassFile = function(fileName) {
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;
     
-    var method = this.getStaticMethod(classArea.getClassName(), "<clinit>", "()V");
-    if (method instanceof Frame) {
-        LOG.debug("fire " + classArea.getClassName() + ".<clinit> ...");
-        method.run([], function() {});
+    var clinit = this.getStaticMethod(classArea.getClassName(), "<clinit>", "()V");
+    if (clinit instanceof Frame) {
+        LOG.debug("call " + classArea.getClassName() + ".<clinit> ...");
+        clinit.run([], function() {});
     }
     
     return classArea;
@@ -47,18 +47,18 @@ Classes.prototype.getEntryPoint = function(className, methodName) {
     for(var name in this.classes) {
         var ca = this.classes[name];
         if (ca instanceof ClassArea) {
-            if (!className || (className === ca.getClassName())) {    
+            if (!className || (className === ca.getClassName())) {
                 if (ACCESS_FLAGS.isPublic(ca.getAccessFlags())) {
-                    var ms = ca.getMethods();
+                    var methods = ca.getMethods();
                     var cp = ca.getConstantPool();
-                    for(var i=0; i<ms.length; i++) {
+                    for(var i=0; i<methods.length; i++) {
                         if
                         (
-                         ACCESS_FLAGS.isPublic(ms[i].access_flags) &&
-                         ACCESS_FLAGS.isStatic(ms[i].access_flags) &&
-                         cp[ms[i].name_index].bytes === methodName
+                         ACCESS_FLAGS.isPublic(methods[i].access_flags) &&
+                         ACCESS_FLAGS.isStatic(methods[i].access_flags) &&
+                         cp[methods[i].name_index].bytes === methodName
                         )
-                        { return new Frame(ca, ms[i]); }
+                        { return new Frame(ca, methods[i]); }
                     }
                 }
             }
@@ -90,39 +90,35 @@ Classes.prototype.setStaticField = function(className, fieldName, value) {
 }
 
 Classes.prototype.getStaticMethod = function(className, methodName, signature) {
-    var clazz = this.getClass(className);  
-    if(clazz instanceof ClassArea) {
-        var methods = clazz.getMethods();
-        var cp = clazz.getConstantPool();
-        for(var i=0; i<methods.length; i++) {
-            if (cp[methods[i].name_index].bytes === methodName) {
-                if (signature.toString() === cp[methods[i].signature_index].bytes) {
-                    return new Frame(clazz, methods[i]);
-                }
-            }
-        }
+    var ca = this.getClass(className);  
+    if (ca instanceof ClassArea) {
+        var methods = ca.getMethods();
+        var cp = ca.getConstantPool();
+        for(var i=0; i<methods.length; i++) 
+            if (ACCESS_FLAGS.isStatic(methods[i].access_flags)) 
+                if (cp[methods[i].name_index].bytes === methodName)
+                    if (signature.toString() === cp[methods[i].signature_index].bytes)
+                        return new Frame(ca, methods[i]);
     } else {
-        if (methodName in clazz) {
-            return clazz[methodName];
+        if (methodName in ca) {
+            return ca[methodName];
         }
     }
     return null;
 };
         
 Classes.prototype.getMethod = function(className, methodName, signature) {
-    var clazz = this.getClass(className);
-    if (clazz instanceof ClassArea) {
-        var methods = clazz.getMethods();
-        var cp = clazz.getConstantPool();
-        for(var i=0; i<methods.length; i++) {
-            if (cp[methods[i].name_index].bytes === methodName) {
-                if (signature.toString() === cp[methods[i].signature_index].bytes) {
-                    return new Frame(clazz, methods[i]);
-                }
-            }
-        }
+    var ca = this.getClass(className);
+    if (ca instanceof ClassArea) {
+        var methods = ca.getMethods();
+        var cp = ca.getConstantPool();
+        for(var i=0; i<methods.length; i++)
+            if (!ACCESS_FLAGS.isStatic(methods[i].access_flags)) 
+                if (cp[methods[i].name_index].bytes === methodName) 
+                    if (signature.toString() === cp[methods[i].signature_index].bytes) 
+                        return new Frame(ca, methods[i]);
     } else {
-        var o = new clazz();
+        var o = new ca();
         if (methodName in o) {
            return o[methodName];
         }
@@ -131,29 +127,29 @@ Classes.prototype.getMethod = function(className, methodName, signature) {
 };
         
 Classes.prototype.createNewObject = function(className) {
-    var clazz = this.getClass(className);
-    if (clazz instanceof ClassArea) {
+    var ca = this.getClass(className);
+    if (ca instanceof ClassArea) {
         
         var ctor = function() {};
         ctor.getClassName = new Function(util.format("return \"%s\"", className));
         var o = new ctor();
-        o.prototype = this.createNewObject(clazz.getSuperClassName());
+        o.prototype = this.createNewObject(ca.getSuperClassName());
         
-        var cp = clazz.getConstantPool();
+        var cp = ca.getConstantPool();
         
-        clazz.getFields().forEach(function(field) {
+        ca.getFields().forEach(function(field) {
             var fieldName = cp[field.name_index].bytes;
             o[fieldName] = null;
         });
         
-        clazz.getMethods().forEach(function(method) {
+        ca.getMethods().forEach(function(method) {
             var methodName = cp[method.name_index].bytes;
-            o[methodName] = new Frame(clazz, method);
+            o[methodName] = new Frame(ca, method);
         });
         
         return o;
     } else {
-        return new clazz();
+        return new ca();
     }
 }
 
