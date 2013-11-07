@@ -3,9 +3,9 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
-var Scheduler = module.exports = function(mticks) {
+var Scheduler = module.exports = function(MAX_TICKS) {
     if (this instanceof Scheduler) {
-        this._mticks = mticks || 50;
+        this._mticks = MAX_TICKS || 50;
         this._ticks = 0;
     } else {
         return new Scheduler(MAX_TICKS);
