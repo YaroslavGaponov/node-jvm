@@ -54,7 +54,7 @@ Frame.prototype.run = function(args, done) {
     
     var step = function() {
         
-        TICK(function() {
+        SCHEDULER.tick(function() {
             var opCode = self._read8()
             
             switch (opCode) {
@@ -1560,7 +1560,7 @@ Frame.prototype.monitorenter = function(done) {
     if (obj.hasOwnProperty("$lock$")) {
         this._stack.push(obj);
         this._ip--;
-        YIELD();
+        SCHEDULER.yield();
     } else {
         obj["$lock$"] = "locked";
     }
@@ -1570,7 +1570,7 @@ Frame.prototype.monitorenter = function(done) {
 Frame.prototype.monitorexit = function(done) {
     var obj = this._stack.pop();
     delete obj["$lock$"];
-    YIELD();
+    SCHEDULER.yield();
     return done();
 }
 

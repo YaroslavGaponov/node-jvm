@@ -11,30 +11,17 @@ var globalizer = require("./util/globalizer");
 
 var Classes = require("./classes");
 var Threads = require("./threads");
+var Scheduler = require("./scheduler");
 
 var OPCODES = require("./opcodes");
 
-var _tick = function(fn) {
-    if (++ TICK_COUNT > 50) {
-        TICK_COUNT = 0;
-        (setImmediate || process.nextTick)(fn);
-    } else {
-        fn();
-    }
-}
-
-var _yield = function() {
-    TICK_COUNT = Number.MAX_VALUE;
-}
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
         globalizer.add("CLASSES", new Classes());
         globalizer.add("THREADS", new Threads());
+        globalizer.add("SCHEDULER", new Scheduler(100));
         globalizer.add("OPCODES", OPCODES);
-        globalizer.add("TICK", _tick);
-        globalizer.add("TICK_COUNT", 0);
-        globalizer.add("YIELD", _yield);
     } else {
         return new JVM();
     }
@@ -74,7 +61,7 @@ JVM.prototype.run = function() {
     entryPoint.run(arguments, function(code) {
         THREADS.remove("main");
         var exit = function() {
-            TICK(function() {
+            SCHEDULER.tick(function() {
                 if (THREADS.length === 0) {
                     process.exit(code);
                 } else {
