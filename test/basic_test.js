@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 var child_process = require("child_process");
 require('chai').should();
 
-var JVM = require("../../index");
+var JVM = require("../index");
 var jvm = new JVM();
 
 describe('Object', function () {
