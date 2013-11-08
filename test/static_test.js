@@ -11,7 +11,7 @@ var jvm = new JVM();
 describe('Object', function () {
     before(function(done){
         this.timeout(10000);
-        child_process.exec("javac _static/Main.java _static/Object.java", {cwd : __dirname},function(err){
+        child_process.exec("javac _static/Main.java _static/Nested.java", {cwd : __dirname},function(err){
             if (err) throw err;
             jvm.loadClassFiles(__dirname + "/_static");
             CLASSES.cinit();
