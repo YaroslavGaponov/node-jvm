@@ -28,8 +28,12 @@ Classes.prototype.loadClassFile = function(fileName) {
     
     var clinit = this.getStaticMethod(classArea.getClassName(), "<clinit>", "()V");
     if (clinit instanceof Frame) {
-        LOG.debug("call " + classArea.getClassName() + ".<clinit> ...");
-        clinit.run([], function() {});
+        SCHEDULER.sync(function() {
+            LOG.debug("call " + classArea.getClassName() + ".<clinit> ...");
+            clinit.run([], function() {
+                LOG.debug("call " + classArea.getClassName() + ".<clinit> ... done");
+            });
+        });
     }
     
     return classArea;

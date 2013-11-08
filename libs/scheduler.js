@@ -28,3 +28,18 @@ Scheduler.prototype.tick = function(fn) {
 Scheduler.prototype.yield = function() {
     this._ticks = this._mticks;
 }
+
+Scheduler.prototype.sync = function(fn) {
+    var mticks = this._mticks;
+    this._ticks = 0;
+    this._mticks = Number.MAX_VALUE;
+    fn();
+    this._mticks = mticks;
+}
+
+Scheduler.prototype.async = function(fn) {
+    var mticks = this._mticks;
+    this._mticks = this._ticks = 0;
+    fn();
+    this._mticks = mticks;
+}
