@@ -36,10 +36,3 @@ Scheduler.prototype.sync = function(fn) {
     fn();
     this._mticks = mticks;
 }
-
-Scheduler.prototype.async = function(fn) {
-    var mticks = this._mticks;
-    this._mticks = this._ticks = 0;
-    fn();
-    this._mticks = mticks;
-}
