@@ -20,22 +20,26 @@ var Classes = module.exports = function() {
     }
 }
 
+Classes.prototype.initialize = function() {
+    for(var className in this.classes) {
+        classArea = this.classes[className];
+        var clinit = this.getStaticMethod(className, "<clinit>", "()V");
+        if (clinit instanceof Frame) {
+            SCHEDULER.sync(function() {
+                LOG.debug("call " + className + ".<clinit> ...");
+                clinit.run([], function() {
+                    LOG.debug("call " + className + ".<clinit> ... done");
+                });
+            });
+        }
+    }
+}
+
 Classes.prototype.loadClassFile = function(fileName) {
     LOG.debug("loading " + fileName + " ...");
     var bytes = fs.readFileSync(fileName);
     var classArea = new ClassArea(bytes);
-    this.classes[classArea.getClassName()] = classArea;
-    
-    var clinit = this.getStaticMethod(classArea.getClassName(), "<clinit>", "()V");
-    if (clinit instanceof Frame) {
-        SCHEDULER.sync(function() {
-            LOG.debug("call " + classArea.getClassName() + ".<clinit> ...");
-            clinit.run([], function() {
-                LOG.debug("call " + classArea.getClassName() + ".<clinit> ... done");
-            });
-        });
-    }
-    
+    this.classes[classArea.getClassName()] = classArea;    
     return classArea;
 }
 

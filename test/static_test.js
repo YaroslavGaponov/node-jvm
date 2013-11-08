@@ -13,8 +13,7 @@ describe('Object', function () {
         this.timeout(10000);
         child_process.exec("javac _static/Main.java _static/Object.java", {cwd : __dirname},function(err){
             if (err) throw err;
-            jvm.loadClassFile(__dirname + "/_static/Main.class");
-            jvm.loadClassFile(__dirname + "/_static/Object.class");
+            jvm.loadClassFiles(__dirname + "/_static");
             done();
         });
     });

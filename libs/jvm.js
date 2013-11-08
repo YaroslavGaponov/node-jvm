@@ -62,6 +62,8 @@ JVM.prototype.loadJSFile = function(fileName) {
 }
 
 JVM.prototype.run = function() {
+    CLASSES.initialize();
+    
     var entryPoint = CLASSES.getEntryPoint();
     if (!entryPoint) {
         throw new Error("Entry point method is not found.");
