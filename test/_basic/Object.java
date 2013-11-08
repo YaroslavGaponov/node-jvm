@@ -1,2 +1,2 @@
-package basic;
+package _basic;
 public class Object {}
