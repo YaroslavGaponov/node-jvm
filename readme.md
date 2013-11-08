@@ -38,7 +38,7 @@ public class Main {
 
 ### node.js
 ```javascript
-var JVM = require("node-jvm);
+var JVM = require("node-jvm");
 var jvm = new JVM();
 jvm.setLogLevel(0);
 jvm.setSchedulerMaxTicks(1000);
