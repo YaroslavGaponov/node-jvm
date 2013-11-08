@@ -20,7 +20,7 @@ var Classes = module.exports = function() {
     }
 }
 
-Classes.prototype.cinit = function() {
+Classes.prototype.clinit = function() {
     for(var className in this.classes) {
         classArea = this.classes[className];
         var clinit = this.getStaticMethod(className, "<clinit>", "()V");

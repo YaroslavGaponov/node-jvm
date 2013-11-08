@@ -8,13 +8,13 @@ require('chai').should();
 var JVM = require("../index");
 var jvm = new JVM();
 
-describe('Object', function () {
+describe('Static', function () {
     before(function(done){
         this.timeout(10000);
         child_process.exec("javac _static/Main.java _static/Nested.java", {cwd : __dirname},function(err){
             if (err) throw err;
             jvm.loadClassFiles(__dirname + "/_static");
-            CLASSES.cinit();
+            CLASSES.clinit();
             done();
         });
     });

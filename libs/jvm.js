@@ -62,7 +62,7 @@ JVM.prototype.loadJSFile = function(fileName) {
 }
 
 JVM.prototype.run = function() {
-    CLASSES.cinit();
+    CLASSES.clinit();
     
     var entryPoint = CLASSES.getEntryPoint();
     if (!entryPoint) {
