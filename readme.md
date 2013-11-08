@@ -1,7 +1,6 @@
-node-jvm
+node-jvm  [![Build Status](https://travis-ci.org/YaroslavGaponov/node-jvm.png?branch=master)](https://travis-ci.org/YaroslavGaponov/node-jvm)
 ========
 
-[![Build Status](https://travis-ci.org/YaroslavGaponov/node-jvm.png?branch=master)](https://travis-ci.org/YaroslavGaponov/node-jvm)
 
 ## Overview
 
