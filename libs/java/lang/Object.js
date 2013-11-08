@@ -28,7 +28,7 @@ Object.prototype["toString"] = function() {
 
 Object.prototype["hashCode"] = function() {
     if (!this._hashCode) {
-        this._hashCode = Math.floor(Math.random()*65535);
+        this._hashCode = Math.floor(Math.random() * 0xffffffff);
     }
     return this._hashCode;
 }

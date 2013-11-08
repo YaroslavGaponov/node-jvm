@@ -30,7 +30,12 @@ public class Main {
 		System.out.println("mike is instanceOf Dog: " + (mike instanceof Dog));
 		System.out.println("sten is instanceOf Dog: " + (sten instanceof Dog));
 		System.out.println("sten is instanceOf Cat: " + (sten instanceof Cat));
-
+		
+		for(int i=0; i<2; i++) {
+			System.out.println("mike.hashCode: " + mike.hashCode());
+			System.out.println("sten.hashCode: " + sten.hashCode());
+		}
+		
 		mike.say("hello, nice day!");
 		sten.say("woof!");
 		mike.say("good bye!");
