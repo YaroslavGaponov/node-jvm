@@ -14,6 +14,7 @@ describe('Object', function () {
         child_process.exec("javac _static/Main.java _static/Object.java", {cwd : __dirname},function(err){
             if (err) throw err;
             jvm.loadClassFiles(__dirname + "/_static");
+            CLASSES.cinit();
             done();
         });
     });
