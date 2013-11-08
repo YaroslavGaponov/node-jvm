@@ -1509,7 +1509,7 @@ Frame.prototype.instanceof = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[idx].name_index].bytes;
     var obj = this._stack.pop();
-    if (obj.constructor.getClassName() === className) {
+    if (obj.getClassName() === className) {
         this._stack.push(true);
     } else {
         this._stack.push(false);
@@ -1532,7 +1532,7 @@ Frame.prototype.athrow = function(done) {
                 def = this._exception_table[i].handler_pc;             
             } else {
                 var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
-                if (exClassName  === ex.constructor.getClassName()) {
+                if (exClassName  === ex.getClassName()) {
                     this._ip = this._exception_table[i].handler_pc;
                     return done();
                 }

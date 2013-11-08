@@ -46,7 +46,7 @@ describe('Object', function () {
     describe("toString", function () {
         it("return correct class object", function () {
             var o1=CLASSES.createNewObject("SomeObject");
-            expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode());
+            expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode().toString(16));
         });
     });
 

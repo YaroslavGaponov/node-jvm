@@ -49,6 +49,6 @@ Throwable.prototype.getCause = function() {
 }
 
 Throwable.prototype.toString = function() {
-    return util.format("Exception %s: %s", this.constructor.getClassName(), this.message);
+    return util.format("Exception %s: %s", this.getClassName(), this.message);
 }
 

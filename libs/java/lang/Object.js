@@ -23,7 +23,7 @@ Object.prototype["<init>"] = function() {
 }
 
 Object.prototype["toString"] = function() {
-    return util.format("%s@%s", this.constructor.getClassName(), this.hashCode());
+    return this.getClassName() + "@" +  this.hashCode().toString(16);
 }
 
 Object.prototype["hashCode"] = function() {

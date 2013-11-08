@@ -6,17 +6,17 @@
 var util = require("util");
 var RuntimeException = require("./RuntimeException.js");
 
-var EmptyStackException.js = module.exports = function() {
-    if (this instanceof EmptyStackException.js) {
+var EmptyStackException = module.exports = function() {
+    if (this instanceof EmptyStackException) {
         RuntimeException.call(this);
     } else {
-        return new EmptyStackException.js();
+        return new EmptyStackException();
     }
 }
 
-util.inherits(EmptyStackException.js, RuntimeException);
+util.inherits(EmptyStackException, RuntimeException);
 
-EmptyStackException.js.getClassName = function() {
+EmptyStackException.getClassName = function() {
     return "java/lang/EmptyStackException.js";    
 }
 

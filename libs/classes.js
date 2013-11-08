@@ -135,9 +135,10 @@ Classes.prototype.createNewObject = function(className) {
     if (ca instanceof ClassArea) {
         
         var ctor = function() {};
-        ctor.getClassName = new Function(util.format("return \"%s\"", className));
+        ctor.prototype = this.createNewObject(ca.getSuperClassName());
         var o = new ctor();
-        o.prototype = this.createNewObject(ca.getSuperClassName());
+        
+        o.getClassName = new Function(util.format("return \"%s\"", className));
         
         var cp = ca.getConstantPool();
         
@@ -153,7 +154,9 @@ Classes.prototype.createNewObject = function(className) {
         
         return o;
     } else {
-        return new ca();
+        var o = new ca();
+        o.getClassName = new Function(util.format("return \"%s\"", className));
+        return o;
     }
 }
 

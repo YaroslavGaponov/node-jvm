@@ -31,10 +31,10 @@ public class Main {
 		System.out.println("sten is instanceOf Dog: " + (sten instanceof Dog));
 		System.out.println("sten is instanceOf Cat: " + (sten instanceof Cat));
 		
-		for(int i=0; i<2; i++) {
-			System.out.println("mike.hashCode: " + mike.hashCode());
-			System.out.println("sten.hashCode: " + sten.hashCode());
-		}
+		System.out.println("mike.hashCode: " + mike.hashCode());
+		System.out.println("mike.toString: " + mike.toString());
+		System.out.println("sten.hashCode: " + sten.hashCode());
+		System.out.println("sten.toString: " + sten.toString());
 		
 		mike.say("hello, nice day!");
 		sten.say("woof!");
