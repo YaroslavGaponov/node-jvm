@@ -1,6 +1,8 @@
 node-jvm
 ========
 
+[![Build Status](https://travis-ci.org/YaroslavGaponov/node-jvm.png?branch=master)](https://travis-ci.org/YaroslavGaponov/node-jvm)
+
 ## Overview
 
 node-jvm - jvm in pure node.js
