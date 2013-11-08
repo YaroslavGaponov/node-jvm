@@ -29,8 +29,9 @@ describe('Object', function () {
         
         it("should return true for custom number", function () {
             var main = CLASSES.createNewObject("_static/Main");
-            CLASSES.getStaticField("_static/Main","o").setNumber.run([main, 1000], function() {
-                CLASSES.getStaticField("_static/Main","o").getNumber.run([main], function(number) {
+            var nested = CLASSES.getStaticField("_static/Main","o");
+            nested.setNumber.run([main, 1000], function() {
+                nested.getNumber.run([nested], function(number) {
                      expect(number).to.be.equal(1000);
                 });
             });
