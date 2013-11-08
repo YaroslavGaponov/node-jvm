@@ -38,10 +38,12 @@ public class Main {
 
 ### node.js
 ```javascript
-var JVM = require("../../index");
+var JVM = require("node-jvm);
 var jvm = new JVM();
-jvm.loadClassFile("./Main.class");
-jvm.run([10]);
+jvm.setLogLevel(0);
+jvm.setSchedulerMaxTicks(1000);
+jvm.loadClassFiles(__dirname);
+jvm.run([15]);
 ```
 
 ### build java files
@@ -55,7 +57,7 @@ jvm.run([10]);
 
 ### output
 ```
-Fibonacci from 1 to 10:
+Fibonacci from 1 to 15:
 1: 1
 2: 1
 3: 2
@@ -66,7 +68,12 @@ Fibonacci from 1 to 10:
 8: 21
 9: 34
 10: 55
-time: 18ms
+11: 89
+12: 144
+13: 233
+14: 377
+15: 610
+time: 106ms
 done.
 ```
 
@@ -74,12 +81,16 @@ done.
 `cd examples/`
 
 ```
-cast
-dogs
-fibonacci
-idogs
-static
-switcher
+arrays - working with different types of arrays 
+dogs - simple object-oriented programming
+fibonacci - recursion
+jsclass - java and javascript mix
+switcher - working with different switches
+cast - cast for different types
+ex - exceptions
+idogs - working with interface
+static - working with static objects
+threads - multithreading
 ```
 
 
