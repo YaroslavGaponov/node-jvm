@@ -16,7 +16,7 @@ describe('Operator', function () {
         child_process.exec("javac Operators.java", {cwd: __dirname}, function (err) {
             if (err) throw err;
             jvm.loadClassFiles(__dirname);
-            o1= process.JVM.Loader.createNewObject("Operators");
+            o1= CLASSES.createNewObject("Operators");
 
             done();
         });

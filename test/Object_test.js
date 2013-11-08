@@ -23,21 +23,21 @@ describe('Object', function () {
 
     describe("equals", function () {
         it("should return true for same instance", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
             expect(o1.equals(o1)).to.be.true;
 
         });
 
         it("should return false for different instances", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
-            var o2=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
+            var o2=CLASSES.createNewObject("SomeObject");
             expect(o1.equals(o2)).to.be.false;
 
         });
     });
    /* describe("getClass", function () {
         it("return correct class object", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
 
             expect(o1.getClass().getSimpleName()).to.be.equal('SomeObject');
 
@@ -47,7 +47,7 @@ describe('Object', function () {
 
     describe("toString", function () {
         it("return correct class object", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
 
             expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode().toString(16));
 
@@ -57,7 +57,7 @@ describe('Object', function () {
 
     describe("hashcode", function () {
         it("should return an int", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
             expect(o1.hashCode()).to.be.a('number');
 
             expect(o1.hashCode()).to.be.greaterThan(0);
@@ -65,8 +65,8 @@ describe('Object', function () {
         });
 
         it("should be different for different instances", function () {
-            var o1=process.JVM.Loader.createNewObject("SomeObject");
-            var o2=process.JVM.Loader.createNewObject("SomeObject");
+            var o1=CLASSES.createNewObject("SomeObject");
+            var o2=CLASSES.createNewObject("SomeObject");
             expect(o1.hashCode()).not.to.be.equal(o2.hashCode());
         });
 
