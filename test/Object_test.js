@@ -35,25 +35,20 @@ describe('Object', function () {
 
         });
     });
-   /* describe("getClass", function () {
+    
+    describe("getClass", function () {
         it("return correct class object", function () {
             var o1=CLASSES.createNewObject("SomeObject");
-
-            expect(o1.getClass().getSimpleName()).to.be.equal('SomeObject');
-
-
+            expect(o1.getClassName()).to.be.equal('SomeObject');
         });
     });
 
     describe("toString", function () {
         it("return correct class object", function () {
             var o1=CLASSES.createNewObject("SomeObject");
-
-            expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode().toString(16));
-
-
+            expect(o1.toString()).to.be.equal("SomeObject@"+o1.hashCode());
         });
-    });*/
+    });
 
     describe("hashcode", function () {
         it("should return an int", function () {
