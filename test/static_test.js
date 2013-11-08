@@ -21,16 +21,15 @@ describe('Object', function () {
 
     describe("equals", function () {
         it("should return true for default number", function () {
-            var main = CLASSES.createNewObject("_static/Main");
-            CLASSES.getStaticField("_static/Main","o").getNumber.run([main], function(number) {
+            var nested = CLASSES.getStaticField("_static/Main","o");
+            nested.getNumber.run([nested], function(number) {
                 expect(number).to.be.equal(1);
             });
         });
         
         it("should return true for custom number", function () {
-            var main = CLASSES.createNewObject("_static/Main");
             var nested = CLASSES.getStaticField("_static/Main","o");
-            nested.setNumber.run([main, 1000], function() {
+            nested.setNumber.run([nested, 1000], function() {
                 nested.getNumber.run([nested], function(number) {
                      expect(number).to.be.equal(1000);
                 });
