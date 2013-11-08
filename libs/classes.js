@@ -94,7 +94,7 @@ Classes.prototype.getStaticField = function(className, fieldName) {
 }
 
 Classes.prototype.setStaticField = function(className, fieldName, value) {
-    this.staticFields[className + '.' + fieldName] = value;   
+    this.staticFields[className + '.' + fieldName] = value;
 }
 
 Classes.prototype.getStaticMethod = function(className, methodName, signature) {

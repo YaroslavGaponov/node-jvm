@@ -22,13 +22,18 @@ describe('Object', function () {
     describe("equals", function () {
         it("should return true for default number", function () {
             var main = CLASSES.createNewObject("_static/Main");
-            expect(main.o.getNumber()).to.be.equal(1);
+            CLASSES.getStaticField("_static/Main","o").getNumber.run([main], function(number) {
+                expect(number).to.be.equal(1);
+            });
         });
         
         it("should return true for custom number", function () {
             var main = CLASSES.createNewObject("_static/Main");
-            main.o.setNumber(1000);
-            expect(main.o.getNumber()).to.be.equal(1000);
+            CLASSES.getStaticField("_static/Main","o").setNumber.run([main, 1000], function() {
+                CLASSES.getStaticField("_static/Main","o").getNumber.run([main], function(number) {
+                     expect(number).to.be.equal(1000);
+                });
+            });
         });
     });
     

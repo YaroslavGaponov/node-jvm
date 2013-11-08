@@ -1,8 +1,8 @@
 package _static;
-public class Object {
+public class Nested {
 	private int number;
 	
-	public Object(int number) {
+	public Nested(int number) {
 		this.number = number;
 	}
         

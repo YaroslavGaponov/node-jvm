@@ -1,4 +1,4 @@
 package _static;
 public class Main {
-    public static Object o = new Object(1);
+    public static Nested o = new Nested(1);
 }
