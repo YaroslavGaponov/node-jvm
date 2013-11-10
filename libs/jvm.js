@@ -53,7 +53,6 @@ JVM.prototype.loadClassFiles = function(dirName) {
                 self.loadClassFile(p);
             }
         } else if (stat.isDirectory()) {
-            CLASSES.addPath(p);
             self.loadClassFiles(p);
         }
     });
