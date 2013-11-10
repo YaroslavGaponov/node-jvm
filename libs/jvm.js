@@ -43,6 +43,7 @@ JVM.prototype.loadClassFile = function(fileName) {
 
 JVM.prototype.loadClassFiles = function(dirName) {
     var self = this;
+    CLASSES.addPath(dirName);
     var files = fs.readdirSync(dirName);
     files.forEach(function(file) {
         var p = util.format("%s/%s", dirName, file);
@@ -52,6 +53,7 @@ JVM.prototype.loadClassFiles = function(dirName) {
                 self.loadClassFile(p);
             }
         } else if (stat.isDirectory()) {
+            CLASSES.addPath(p);
             self.loadClassFiles(p);
         }
     });

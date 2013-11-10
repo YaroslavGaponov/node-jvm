@@ -13,11 +13,16 @@ var ACCESS_FLAGS = require("./classfile/accessflags.js");
 
 var Classes = module.exports = function() {
     if (this instanceof Classes) {
+        this.paths = [ __dirname ];
         this.classes = {};
         this.staticFields = {};
     } else  {
         return new Classes();
     }
+}
+
+Classes.prototype.addPath = function(path) {
+    this.paths.push(path);
 }
 
 Classes.prototype.clinit = function() {
@@ -79,12 +84,14 @@ Classes.prototype.getClass = function(className) {
     if (ca) {
         return ca;
     }
-    var fileName = util.format("%s/%s", __dirname, className);
-    if (fs.existsSync(fileName + ".js")) {
-        return this.loadJSFile(fileName + ".js");
-    }
-    if(fs.existsSync(fileName + ".class")) {
-        return this.loadClassFile(fileName + ".class");
+    for(var i=0; i<this.paths.length; i++) {
+        var fileName = util.format("%s/%s", this.paths[i], className);
+        if (fs.existsSync(fileName + ".js")) {
+            return this.loadJSFile(fileName + ".js");
+        }
+        if(fs.existsSync(fileName + ".class")) {
+            return this.loadClassFile(fileName + ".class");
+        }
     }
     throw new Error(util.format("Implementation of the %s class is not found.", className));
 };
