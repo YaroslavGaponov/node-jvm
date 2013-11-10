@@ -22,7 +22,9 @@ var Classes = module.exports = function() {
 }
 
 Classes.prototype.addPath = function(path) {
-    this.paths.push(path);
+    if (this.paths.indexOf(path) === -1) {
+        this.paths.push(path);
+    }
 }
 
 Classes.prototype.clinit = function() {
