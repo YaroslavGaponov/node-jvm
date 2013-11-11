@@ -62,7 +62,7 @@ JVM.prototype.loadJSFile = function(fileName) {
     return CLASSES.loadJSFile(fileName);
 }
 
-JVM.prototype.run = function() {
+JVM.prototype.run = function(cb) {
     CLASSES.clinit();
     
     var entryPoint = CLASSES.getEntryPoint();
@@ -76,7 +76,11 @@ JVM.prototype.run = function() {
         var exit = function() {
             SCHEDULER.tick(function() {
                 if (THREADS.length === 0) {
-                    process.exit(code);
+                    if (cb && typeof cb === "function") {
+                        cb(code);
+                    } else {
+                        process.exit(code);
+                    }
                 } else {
                     exit();
                 }
