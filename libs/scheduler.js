@@ -27,6 +27,7 @@ Scheduler.prototype.tick = function(pid, fn) {
         case MODE.YIELD:
             this._mode = MODE.NORMAL;
         case MODE.ASYNC:
+            this._ticks = 0;
             (setImmediate || process.nextTick)(fn);
             break;
         case MODE.NORMAL:
