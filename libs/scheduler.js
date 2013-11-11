@@ -3,36 +3,55 @@
  Copyright (c) 2013 Yaroslav Gaponov <yaroslav.gaponov@gmail.com>
 */
 
+var MODE = {
+    NORMAL: 0,
+    SYNC: 1,
+    ASYNC: 2,
+    YIELD: 3
+}
+
 var Scheduler = module.exports = function(mticks) {
     if (this instanceof Scheduler) {
-        this._mticks = mticks || 50;
         this._ticks = 0;
+        this._mode = MODE.NORMAL;
     } else {
         return new Scheduler(mticks);
     }
 }
 
-Scheduler.prototype.setMaxTicks = function(mticks) {
-    this._mticks = mticks;
-}
-
-Scheduler.prototype.tick = function(fn) {
-    if (++ this._ticks > this._mticks) {
-        this._ticks = 0;
-        (setImmediate || process.nextTick)(fn);
-    } else {
-        fn();
+Scheduler.prototype.tick = function(pid, fn) {
+    switch(this._mode) {
+        case MODE.SYNC:
+            fn();
+            break;
+        case MODE.YIELD:
+            this._mode = MODE.NORMAL;
+        case MODE.ASYNC:
+            (setImmediate || process.nextTick)(fn);
+            break;
+        case MODE.NORMAL:
+            if (++ this._ticks > THREADS.getThread(pid).getPriority()) {
+                this._ticks = 0;
+                (setImmediate || process.nextTick)(fn);
+            } else {
+                fn();
+            }
+            break;
     }
 }
 
 Scheduler.prototype.yield = function() {
-    this._ticks = this._mticks;
+    this._mode = MODE.YIELD;
 }
 
 Scheduler.prototype.sync = function(fn) {
-    var mticks = this._mticks;
-    this._ticks = 0;
-    this._mticks = Number.MAX_VALUE;
+    this._mode = MODE.SYNC;
     fn();
-    this._mticks = mticks;
+    this._mode = MODE.NORMAL;
+}
+
+Scheduler.prototype.async = function(fn) {
+    this._mode = MODE.ASYNC;
+    fn();
+    this._mode = MODE.NORMAL;
 }

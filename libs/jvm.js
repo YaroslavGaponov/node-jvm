@@ -16,7 +16,7 @@ var Scheduler = require("./scheduler");
 var Logger = require("./logger");
 
 var OPCODES = require("./opcodes");
-
+var Thread = require("./thread");
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
@@ -35,10 +35,6 @@ util.inherits(JVM, EE);
 
 JVM.prototype.setLogLevel = function(level) {
     LOG.setLogLevel(level);
-}
-
-JVM.prototype.setSchedulerMaxTicks = function(mticks) {
-    SCHEDULER.setMaxTicks(mticks);
 }
 
 JVM.prototype.loadClassFile = function(fileName) {
@@ -69,19 +65,21 @@ JVM.prototype.loadJSFile = function(fileName) {
 JVM.prototype.run = function() {
     var self = this;
     
+    var main = new Thread("main");
+    var pid = THREADS.add(main);
+    
     CLASSES.clinit();
     
     var entryPoint = CLASSES.getEntryPoint();
     if (!entryPoint) {
         throw new Error("Entry point method is not found.");
     }
-    
-    THREADS.add("main");
+        
     entryPoint.run(arguments, function(code) {
-        THREADS.remove("main");
         var exit = function() {
-            SCHEDULER.tick(function() {
-                if (THREADS.length === 0) {
+            SCHEDULER.tick(pid, function() {
+                if (THREADS.count() === 1) {
+                    THREADS.remove(pid);
                     self.emit("exit", code);
                 } else {
                     exit();

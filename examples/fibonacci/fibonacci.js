@@ -2,8 +2,7 @@
 
 var JVM = require("../../index");
 var jvm = new JVM();
-jvm.setLogLevel(0);
-jvm.setSchedulerMaxTicks(1000);
+jvm.setLogLevel(7);
 jvm.loadClassFiles(__dirname);
 jvm.on("exit", function(code) {
     process.exit(code);

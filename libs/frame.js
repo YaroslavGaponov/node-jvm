@@ -13,6 +13,7 @@ var ATTRIBUTE_TYPES = require("./classfile/attributetypes");
 
 var Frame = module.exports = function(classArea, method) {
     if (this instanceof Frame) {
+        this._pid = 0; // default main thread
         this._cp = classArea.getConstantPool();
         
         for(var i=0; i<method.attributes.length; i++) {
@@ -27,6 +28,10 @@ var Frame = module.exports = function(classArea, method) {
     } else {
         return new Frame(classArea, method);
     }
+}
+
+Frame.prototype.setPid = function(pid) {
+    this._pid = pid;
 }
 
 Frame.prototype._read8 = function() {
@@ -54,7 +59,7 @@ Frame.prototype.run = function(args, done) {
     
     var step = function() {
         
-        SCHEDULER.tick(function() {
+        SCHEDULER.tick(self._pid, function() {
             var opCode = self._read8()
             
             switch (opCode) {
