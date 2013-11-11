@@ -5,4 +5,7 @@ var jvm = new JVM();
 jvm.setLogLevel(0);
 jvm.setSchedulerMaxTicks(1000);
 jvm.loadClassFiles(__dirname);
+jvm.on("exit", function(code) {
+    process.exit(code);
+});
 jvm.run([15]);

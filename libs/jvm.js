@@ -6,6 +6,7 @@
 var util = require("util");
 var fs = require("fs");
 var path = require("path");
+var EE = require("events").EventEmitter;
 
 var globalizer = require("./util/globalizer");
 
@@ -19,6 +20,7 @@ var OPCODES = require("./opcodes");
 
 var JVM = module.exports = function() {
     if (this instanceof JVM) {
+        JVM.super_.call(this);
         globalizer.add("LOG", new Logger());
         globalizer.add("CLASSES", new Classes());
         globalizer.add("THREADS", new Threads());
@@ -28,6 +30,8 @@ var JVM = module.exports = function() {
         return new JVM();
     }
 }
+
+util.inherits(JVM, EE);
 
 JVM.prototype.setLogLevel = function(level) {
     LOG.setLogLevel(level);
@@ -62,7 +66,9 @@ JVM.prototype.loadJSFile = function(fileName) {
     return CLASSES.loadJSFile(fileName);
 }
 
-JVM.prototype.run = function(cb) {
+JVM.prototype.run = function() {
+    var self = this;
+    
     CLASSES.clinit();
     
     var entryPoint = CLASSES.getEntryPoint();
@@ -76,11 +82,7 @@ JVM.prototype.run = function(cb) {
         var exit = function() {
             SCHEDULER.tick(function() {
                 if (THREADS.length === 0) {
-                    if (cb && typeof cb === "function") {
-                        cb(code);
-                    } else {
-                        process.exit(code);
-                    }
+                    self.emit("exit", code);
                 } else {
                     exit();
                 }
