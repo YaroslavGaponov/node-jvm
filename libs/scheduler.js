@@ -6,8 +6,7 @@
 var MODE = {
     NORMAL: 0,
     SYNC: 1,
-    ASYNC: 2,
-    YIELD: 3
+    YIELD: 2
 }
 
 var Scheduler = module.exports = function(mticks) {
@@ -26,7 +25,6 @@ Scheduler.prototype.tick = function(pid, fn) {
             break;
         case MODE.YIELD:
             this._mode = MODE.NORMAL;
-        case MODE.ASYNC:
             this._ticks = 0;
             (setImmediate || process.nextTick)(fn);
             break;
@@ -51,8 +49,3 @@ Scheduler.prototype.sync = function(fn) {
     this._mode = MODE.NORMAL;
 }
 
-Scheduler.prototype.async = function(fn) {
-    this._mode = MODE.ASYNC;
-    fn();
-    this._mode = MODE.NORMAL;
-}
