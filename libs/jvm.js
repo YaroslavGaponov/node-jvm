@@ -26,6 +26,8 @@ var JVM = module.exports = function() {
         globalizer.add("THREADS", new Threads());
         globalizer.add("SCHEDULER", new Scheduler());
         globalizer.add("OPCODES", OPCODES);
+        
+        THREADS.add(new Thread("main"));
     } else {
         return new JVM();
     }
@@ -65,9 +67,6 @@ JVM.prototype.loadJSFile = function(fileName) {
 JVM.prototype.run = function() {
     var self = this;
     
-    var main = new Thread("main");
-    var pid = THREADS.add(main);
-    
     CLASSES.clinit();
     
     var entryPoint = CLASSES.getEntryPoint();
@@ -77,9 +76,9 @@ JVM.prototype.run = function() {
         
     entryPoint.run(arguments, function(code) {
         var exit = function() {
-            SCHEDULER.tick(pid, function() {
+            SCHEDULER.tick(0, function() {
                 if (THREADS.count() === 1) {
-                    THREADS.remove(pid);
+                    THREADS.remove(0);
                     self.emit("exit", code);
                 } else {
                     exit();
