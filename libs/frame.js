@@ -1302,6 +1302,7 @@ Frame.prototype.invokestatic = function(done) {
     var method = CLASSES.getStaticMethod(className, methodName, signature);
     
     if (method instanceof Frame) {
+        method.setPid(self._pid);
         method.run(args, function(res) {
             if (signature.OUT.length != 0) {                        
                self._stack.push(res);
@@ -1343,6 +1344,7 @@ Frame.prototype.invokevirtual = function(done) {
       
     if (method instanceof Frame) {
         args.unshift(instance);
+        method.setPid(self._pid);
         method.run(args, function(res) {
             if (signature.OUT.length != 0) {                        
                self._stack.push(res);
@@ -1383,6 +1385,7 @@ Frame.prototype.invokespecial = function(done) {
     
     if (ctor instanceof Frame) {
         args.unshift(instance);
+        ctor.setPid(self._pid);
         ctor.run(args, function() {
             return done();
         });
@@ -1419,6 +1422,7 @@ Frame.prototype.invokeinterface = function(done) {
       
     if (instance[methodName] instanceof Frame) {
         args.unshift(instance);
+        instance[methodName].setPid(self._pid);
         instance[methodName].run(args, function(res) {
             if (signature.OUT.length != 0) {                        
                self._stack.push(res);

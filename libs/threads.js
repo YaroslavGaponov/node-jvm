@@ -4,22 +4,27 @@
 */
 
 var Threads = module.exports = function() {
-    this.threads = {};
-    this.counter = 0;
+    this.threads = [];
+    this.empty = [];
 }
 
 Threads.prototype.add = function(thread) {
-    var pid = this.counter++;
-    this.threads[pid] = thread;
-    return pid;
+    if (this.empty.length > 0) {
+        var pid = this.empty.pop();
+        this.threads[pid] = thread;
+        return pid;
+    } else {
+        return this.threads.push(thread) - 1;
+    }
 }
 
 Threads.prototype.remove = function(pid) {
-    delete this.threads[pid];
+    this.empty.push(pid);
+    this.threads[pid] = null;
 }
 
 Threads.prototype.count = function() {
-    return Object.keys(this.threads).length;
+    return this.threads.length - this.empty.length;
 }
 
 Threads.prototype.getThread = function(pid) {

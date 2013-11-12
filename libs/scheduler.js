@@ -5,9 +5,9 @@
 
 var MODE = {
     NORMAL: 0,
-    SYNC: 1,
-    YIELD: 2
-}
+    SYNC:   1,
+    YIELD:  2
+};
 
 var Scheduler = module.exports = function(mticks) {
     if (this instanceof Scheduler) {
@@ -29,7 +29,7 @@ Scheduler.prototype.tick = function(pid, fn) {
             (setImmediate || process.nextTick)(fn);
             break;
         case MODE.NORMAL:
-            if (++ this._ticks > THREADS.getThread(pid).getPriority()) {
+            if (++this._ticks > THREADS.getThread(pid).getPriority()) {
                 this._ticks = 0;
                 (setImmediate || process.nextTick)(fn);
             } else {

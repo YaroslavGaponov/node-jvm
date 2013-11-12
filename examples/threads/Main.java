@@ -13,7 +13,8 @@ public class Main {
 		
 		Dog nika = new Dog("Nika", 30);
 		Thread nikaThread = new Thread(nika);
-
+		nikaThread.setPriority(Thread.MAX_PRIORITY);
+		
 		mikeThread.start();
 		stenThread.start();
 		nikaThread.start();
