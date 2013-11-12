@@ -414,6 +414,9 @@ Frame.prototype.daload = function(done) {
 Frame.prototype.aaload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
+    if (!refArray) {
+        this._throw("java/lang/NullPointerException");
+    }
     this._stack.push(refArray[idx]);
     return done();
 }
@@ -1533,6 +1536,11 @@ Frame.prototype.checkcast = function(done) {
 }
 
 Frame.prototype._throw = function(ex) {
+    
+    if (typeof ex === "string") {
+        ex = CLASSES.createNewObject(ex); 
+    }
+    
     var def = null;
     for(var i=0; i<this._exception_table.length; i++) {
         if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
