@@ -46,6 +46,30 @@ Frame.prototype._read32 = function() {
     return this._read16()<<16 | this._read16();
 };
 
+Frame.prototype._throw = function(ex) {
+    var def = null;
+    for(var i=0; i<this._exception_table.length; i++) {
+        if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
+            if (this._exception_table[i].catch_type === 0) {
+                def = this._exception_table[i].handler_pc;             
+            } else {
+                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
+                if (exClassName  === ex.getClassName()) {
+                    this._stack.push(ex);
+                    this._ip = this._exception_table[i].handler_pc;
+                    return;
+                }
+            }
+        }
+    }
+    if (def !== null) {
+        this._stack.push(ex);
+        this._ip = def;
+        return;        
+    }
+    throw ex;    
+}
+
 Frame.prototype.run = function(args, done) {
     var self = this;
     
@@ -385,21 +409,63 @@ Frame.prototype.aload_3 = function(done) {
 Frame.prototype.iaload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.laload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.faload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
@@ -407,38 +473,105 @@ Frame.prototype.faload = function(done) {
 Frame.prototype.daload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.aaload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
+    
+    var ex = null;
+    
     if (!refArray) {
-        this._throw("java/lang/NullPointerException");
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
-    this._stack.push(refArray[idx]);
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.baload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.caload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
 Frame.prototype.saload = function(done) {
     var idx = this._stack.pop();
     var refArray = this._stack.pop();
-    this._stack.push(refArray[idx]);
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        this._stack.push(refArray[idx]);
+    }
+    
     return done();
 }
 
@@ -581,64 +714,184 @@ Frame.prototype.astore_3 = function(done) {
 Frame.prototype.iastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.lastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.fastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.dastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.aastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.bastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.castore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
 Frame.prototype.sastore = function(done) {
     var val = this._stack.pop();
     var idx = this._stack.pop();                
-    var ref = this._stack.pop();                
-    ref[idx] = val;
+    var refArray = this._stack.pop();
+    
+    
+    var ex = null;
+    
+    if (!refArray) {
+        ex = CLASSES.createException("java/lang/NullPointerException");
+    } else if (idx < 0 || idx >= refArray.length) {
+        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+    }
+    
+    if (ex) {
+        this._throw(ex);
+    } else {
+        refArray[idx] = val;
+    }
+    
     return done();
 }
 
@@ -796,14 +1049,22 @@ Frame.prototype.fmul = function(done) {
 Frame.prototype.idiv = function(done) {
     var val1 = this._stack.pop();
     var val2 = this._stack.pop();
-    this._stack.push(val2 / val1);
+    if (val1 === 0) {
+        this._throw(CLASSES.createException("java/lang/ArithmeticException"));
+    } else {
+        this._stack.push(val2 / val1);
+    }
     return done();
 }
 
 Frame.prototype.ldiv = function(done) {
     var val1 = this._stack.pop();
     var val2 = this._stack.pop();
-    this._stack.push(val2 / val1);
+    if (val1 === 0) {
+        this._throw(CLASSES.createException("java/lang/ArithmeticException"));
+    } else {
+        this._stack.push(val2 / val1);
+    }
     return done();
 }
 
@@ -1018,7 +1279,11 @@ Frame.prototype.dcmpg = function(done) {
 Frame.prototype.newarray = function(done) {
     var type = this._read8();  
     var size = this._stack.pop();
-    this._stack.push(new Array(size));    
+    if (size < 0) {
+        this._throw(CLASSES.createException("java/lang/NegativeSizeException"));
+    } else {
+        this._stack.push(new Array(size));
+    }
     return done();    
 }
 
@@ -1027,7 +1292,11 @@ Frame.prototype.anewarray = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[idx].name_index].bytes;       
     var size = this._stack.pop();
-    this._stack.push(new Array(size));
+    if (size < 0) {
+        this._throw(CLASSES.createException("java/lang/NegativeSizeException"));
+    } else {
+        this._stack.push(new Array(size));
+    }
     return done();
 }
 
@@ -1247,7 +1516,11 @@ Frame.prototype.putfield = function(done) {
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;    
     var val = this._stack.pop();
     var obj = this._stack.pop();
-    obj[fieldName] = val;
+    if (!obj) {
+        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+    } else {
+        obj[fieldName] = val;
+    }
     return done();
 }
 
@@ -1255,7 +1528,11 @@ Frame.prototype.getfield = function(done) {
     var idx = this._read16();
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var obj = this._stack.pop();
-    this._stack.push(obj[fieldName]);
+    if (!obj) {
+        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+    } else {
+        this._stack.push(obj[fieldName]);
+    }
     return done();
 }
 
@@ -1535,32 +1812,6 @@ Frame.prototype.checkcast = function(done) {
     return done();
 }
 
-Frame.prototype._throw = function(ex) {
-    
-    if (typeof ex === "string") {
-        ex = CLASSES.createNewObject(ex); 
-    }
-    
-    var def = null;
-    for(var i=0; i<this._exception_table.length; i++) {
-        if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
-            if (this._exception_table[i].catch_type === 0) {
-                def = this._exception_table[i].handler_pc;             
-            } else {
-                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
-                if (exClassName  === ex.getClassName()) {
-                    this._ip = this._exception_table[i].handler_pc;
-                    return;
-                }
-            }
-        }
-    }
-    if (def !== null) {
-        this._ip = def;
-        return;        
-    }
-    throw ex;    
-}
 
 Frame.prototype.athrow = function(done) {
     this._throw(this._stack.pop());
@@ -1574,7 +1825,9 @@ Frame.prototype.wide = function(done) {
 
 Frame.prototype.monitorenter = function(done) {
     var obj = this._stack.pop();
-    if (obj.hasOwnProperty("$lock$")) {
+    if (!obj) {
+        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+    } else if (obj.hasOwnProperty("$lock$")) {
         this._stack.push(obj);
         this._ip--;
         SCHEDULER.yield();
@@ -1586,8 +1839,12 @@ Frame.prototype.monitorenter = function(done) {
 
 Frame.prototype.monitorexit = function(done) {
     var obj = this._stack.pop();
-    delete obj["$lock$"];
-    SCHEDULER.yield();
+    if (!obj) {
+        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+    } else {
+        delete obj["$lock$"];
+        SCHEDULER.yield();
+    }
     return done();
 }
 

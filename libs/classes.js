@@ -173,3 +173,9 @@ Classes.prototype.createNewObject = function(className) {
     }
 }
 
+Classes.prototype.createException = function(className, message, cause) {
+    var ex = this.createNewObject(className);
+    ex["<init>"](message, cause);
+    return ex;
+}
+

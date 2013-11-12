@@ -4,7 +4,7 @@
 */
 
 var util = require("util");
-var RuntimeException = require("./RuntimeException.js");
+var IndexOutOfBoundsException = require("./IndexOutOfBoundsException.js");
 
 var ArrayIndexOutOfBoundsException = module.exports = function() {
     if (this instanceof IndexOutOfBoundsException) {

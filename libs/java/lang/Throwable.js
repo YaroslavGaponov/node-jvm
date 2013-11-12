@@ -23,15 +23,15 @@ Throwable.getClassName = function() {
 Throwable.prototype["<init>"] = function() {
     switch(arguments.length) {
         case 1:
-            if (typeof arguments[0] === "string") {
+            if (typeof arguments[0] !== "object") {
                 this.message = arguments[0];
             } else {
                 this.cause = arguments[0];
             }
             break;
         case 2:
-            this.message = argument[0];
-            this.cause = argument[1];
+            this.message = arguments[0];
+            this.cause = arguments[1];
             break;
     }
 }
@@ -49,6 +49,9 @@ Throwable.prototype.getCause = function() {
 }
 
 Throwable.prototype.toString = function() {
-    return util.format("Exception %s: %s", this.getClassName(), this.message);
+    if (this.message) {
+        return util.format("Exception %s: %s", this.getClassName(), this.message);
+    }
+    return util.format("Exception %s", this.getClassName());
 }
 
