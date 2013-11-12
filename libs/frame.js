@@ -1532,8 +1532,7 @@ Frame.prototype.checkcast = function(done) {
     return done();
 }
 
-Frame.prototype.athrow = function(done) {
-    var ex = this._stack.pop();
+Frame.prototype._throw = function(ex) {
     var def = null;
     for(var i=0; i<this._exception_table.length; i++) {
         if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
@@ -1543,16 +1542,21 @@ Frame.prototype.athrow = function(done) {
                 var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
                 if (exClassName  === ex.getClassName()) {
                     this._ip = this._exception_table[i].handler_pc;
-                    return done();
+                    return;
                 }
             }
         }
     }
     if (def !== null) {
         this._ip = def;
-        return done();        
+        return;        
     }
-    throw ex;   
+    throw ex;    
+}
+
+Frame.prototype.athrow = function(done) {
+    this._throw(this._stack.pop());
+    return done();
 }
 
 Frame.prototype.wide = function(done) {
