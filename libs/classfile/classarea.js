@@ -42,6 +42,20 @@ ClassArea.prototype.getMethods = function() {
     return this.classImage.methods;
 }
 
+ClassArea.prototype.getClasses = function() {
+    var self = this;
+    var classes = [];
+    this.classImage.attributes.forEach(function(a) {
+        if (a.info.type === ATTRIBUTE_TYPES.InnerClasses) {
+            a.info.classes.forEach(function(c) {
+                classes.push(self.classImage.constant_pool[self.classImage.constant_pool[c.inner_class_info_index].name_index].bytes);
+                classes.push(self.classImage.constant_pool[self.classImage.constant_pool[c.outer_class_info_index].name_index].bytes);
+            });
+        }
+    });
+    return classes;
+}
+
 var getClassImage = function(classBytes) {
 
     var classImage = {};

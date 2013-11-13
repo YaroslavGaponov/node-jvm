@@ -5,6 +5,7 @@
 
 var util = require("util");
 var fs = require("fs");
+var path = require("path");
 
 var ClassArea = require("./classfile/classarea.js");
 var Frame = require("./frame.js");
@@ -46,7 +47,13 @@ Classes.prototype.loadClassFile = function(fileName) {
     LOG.debug("loading " + fileName + " ...");
     var bytes = fs.readFileSync(fileName);
     var classArea = new ClassArea(bytes);
-    this.classes[classArea.getClassName()] = classArea;    
+    this.classes[classArea.getClassName()] = classArea;
+    var classes = classArea.getClasses();
+    for (var i=0; i<classes.length; i++) {
+        if (!this.classes[classes[i]]) {
+            this.loadClassFile(path.dirname(fileName) + path.sep + classes[i] + ".class");
+        }
+    }
     return classArea;
 }
 
