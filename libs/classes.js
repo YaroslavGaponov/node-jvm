@@ -143,12 +143,12 @@ Classes.prototype.getMethod = function(className, methodName, signature) {
     return null;
 };
         
-Classes.prototype.createNewObject = function(className) {
+Classes.prototype.newObject = function(className) {
     var ca = this.getClass(className);
     if (ca instanceof ClassArea) {
         
         var ctor = function() {};
-        ctor.prototype = this.createNewObject(ca.getSuperClassName());
+        ctor.prototype = this.newObject(ca.getSuperClassName());
         var o = new ctor();
         
         o.getClassName = new Function(util.format("return \"%s\"", className));
@@ -173,8 +173,8 @@ Classes.prototype.createNewObject = function(className) {
     }
 }
 
-Classes.prototype.createException = function(className, message, cause) {
-    var ex = this.createNewObject(className);
+Classes.prototype.newException = function(className, message, cause) {
+    var ex = this.newObject(className);
     ex["<init>"](message, cause);
     return ex;
 }

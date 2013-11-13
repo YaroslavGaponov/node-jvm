@@ -17,6 +17,6 @@ Clazz.forName = function(className) {
 }
 
 Clazz.prototype.newInstance = function() {
-    return CLASSES.createNewObject(this._className);
+    return CLASSES.newObject(this._className);
 
 }

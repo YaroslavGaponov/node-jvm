@@ -41,9 +41,11 @@ public class Main {
 ```javascript
 var JVM = require("node-jvm");
 var jvm = new JVM();
-jvm.setLogLevel(0);
-jvm.setSchedulerMaxTicks(1000);
+jvm.setLogLevel(7);
 jvm.loadClassFiles(__dirname);
+jvm.on("exit", function(code) {
+    process.exit(code);
+});
 jvm.run([15]);
 ```
 
@@ -88,7 +90,8 @@ fibonacci - recursion
 jsclass - java and javascript mix
 switcher - working with different switches
 cast - cast for different types
-ex - exceptions
+ex - program exceptions
+ex2 - jvm exceptions
 idogs - working with interface
 static - working with static objects
 threads - multithreading

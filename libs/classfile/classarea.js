@@ -71,7 +71,7 @@ var getClassImage = function(classBytes) {
                 
                 switch(item.bytes) {
                     
-                    case "Code":
+                    case ATTRIBUTE_TYPES.Code:
                         attribute.type = ATTRIBUTE_TYPES.Code;
                         attribute.max_stack = reader.read16();
                         attribute.max_locals = reader.read16();
@@ -98,17 +98,31 @@ var getClassImage = function(classBytes) {
                         }
                         return attribute;
                         
-                    case "SourceFile":
+                    case ATTRIBUTE_TYPES.SourceFile:
                         attribute.type = ATTRIBUTE_TYPES.SourceFile;
                         attribute.sourcefile_index = reader.read16();
                         return attribute;
                     
-                    case "Exceptions":
+                    case ATTRIBUTE_TYPES.Exceptions:
                         attribute.type = ATTRIBUTE_TYPES.Exceptions;
                         var number_of_exceptions = reader.read16();
                         attribute.exception_index_table = [];
                         for(var i=0; i<number_of_exceptions; i++) {
                             attribute.exception_index_table.push(reader.read16());
+                        }
+                        return attribute;
+                    
+                    case ATTRIBUTE_TYPES.InnerClasses:
+                        attribute.type = ATTRIBUTE_TYPES.InnerClasses;
+                        var number_of_classes = reader.read16();
+                        attribute.classes = [];
+                        for(var i=0; i<number_of_classes; i++) {
+                            var inner = {};
+                            inner.inner_class_info_index = reader.read16();
+                            inner.outer_class_info_index = reader.read16();
+                            inner.inner_name_index = reader.read16();
+                            inner.inner_class_access_flags = reader.read16();
+                            attribute.classes.push(inner);
                         }
                         return attribute;
                     

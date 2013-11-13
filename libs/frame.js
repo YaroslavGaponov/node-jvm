@@ -46,28 +46,29 @@ Frame.prototype._read32 = function() {
     return this._read16()<<16 | this._read16();
 };
 
-Frame.prototype._throw = function(ex) {
-    var def = null;
+Frame.prototype._throw = function(ex) { 
+    var handler_pc = null;
+ 
     for(var i=0; i<this._exception_table.length; i++) {
         if (this._ip >= this._exception_table[i].start_pc && this._ip <= this._exception_table[i].end_pc) {
             if (this._exception_table[i].catch_type === 0) {
-                def = this._exception_table[i].handler_pc;             
+                handler_pc = this._exception_table[i].handler_pc;             
             } else {
-                var exClassName = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
-                if (exClassName  === ex.getClassName()) {
-                    this._stack.push(ex);
-                    this._ip = this._exception_table[i].handler_pc;
-                    return;
+                var name = this._cp[this._cp[this._exception_table[i].catch_type].name_index].bytes;
+                if (name === ex.getClassName()) {
+                    handler_pc = this._exception_table[i].handler_pc;
+                    break;
                 }
             }
         }
     }
-    if (def !== null) {
+    
+    if (handler_pc != null) {
         this._stack.push(ex);
-        this._ip = def;
-        return;        
+        this._ip = handler_pc;      
+    } else {
+        throw ex;
     }
-    throw ex;    
 }
 
 Frame.prototype.run = function(args, done) {
@@ -413,9 +414,9 @@ Frame.prototype.iaload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -434,9 +435,9 @@ Frame.prototype.laload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -455,9 +456,9 @@ Frame.prototype.faload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -477,9 +478,9 @@ Frame.prototype.daload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -498,9 +499,9 @@ Frame.prototype.aaload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -519,9 +520,9 @@ Frame.prototype.baload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -540,9 +541,9 @@ Frame.prototype.caload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -561,9 +562,9 @@ Frame.prototype.saload = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -720,9 +721,9 @@ Frame.prototype.iastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -743,9 +744,9 @@ Frame.prototype.lastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -766,9 +767,9 @@ Frame.prototype.fastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -789,9 +790,9 @@ Frame.prototype.dastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -812,9 +813,9 @@ Frame.prototype.aastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -835,9 +836,9 @@ Frame.prototype.bastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -858,9 +859,9 @@ Frame.prototype.castore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -881,9 +882,9 @@ Frame.prototype.sastore = function(done) {
     var ex = null;
     
     if (!refArray) {
-        ex = CLASSES.createException("java/lang/NullPointerException");
+        ex = CLASSES.newException("java/lang/NullPointerException");
     } else if (idx < 0 || idx >= refArray.length) {
-        ex = CLASSES.createException("java/lang/ArrayIndexOutOfBoundsException", idx);
+        ex = CLASSES.newException("java/lang/ArrayIndexOutOfBoundsException", idx);
     }
     
     if (ex) {
@@ -1050,7 +1051,7 @@ Frame.prototype.idiv = function(done) {
     var val1 = this._stack.pop();
     var val2 = this._stack.pop();
     if (val1 === 0) {
-        this._throw(CLASSES.createException("java/lang/ArithmeticException"));
+        this._throw(CLASSES.newException("java/lang/ArithmeticException"));
     } else {
         this._stack.push(val2 / val1);
     }
@@ -1061,7 +1062,7 @@ Frame.prototype.ldiv = function(done) {
     var val1 = this._stack.pop();
     var val2 = this._stack.pop();
     if (val1 === 0) {
-        this._throw(CLASSES.createException("java/lang/ArithmeticException"));
+        this._throw(CLASSES.newException("java/lang/ArithmeticException"));
     } else {
         this._stack.push(val2 / val1);
     }
@@ -1280,7 +1281,7 @@ Frame.prototype.newarray = function(done) {
     var type = this._read8();  
     var size = this._stack.pop();
     if (size < 0) {
-        this._throw(CLASSES.createException("java/lang/NegativeSizeException"));
+        this._throw(CLASSES.newException("java/lang/NegativeSizeException"));
     } else {
         this._stack.push(new Array(size));
     }
@@ -1293,7 +1294,7 @@ Frame.prototype.anewarray = function(done) {
     var className = this._cp[this._cp[idx].name_index].bytes;       
     var size = this._stack.pop();
     if (size < 0) {
-        this._throw(CLASSES.createException("java/lang/NegativeSizeException"));
+        this._throw(CLASSES.newException("java/lang/NegativeSizeException"));
     } else {
         this._stack.push(new Array(size));
     }
@@ -1517,7 +1518,7 @@ Frame.prototype.putfield = function(done) {
     var val = this._stack.pop();
     var obj = this._stack.pop();
     if (!obj) {
-        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+        this._throw(CLASSES.newException("java/lang/NullPointerException"));
     } else {
         obj[fieldName] = val;
     }
@@ -1529,7 +1530,7 @@ Frame.prototype.getfield = function(done) {
     var fieldName = this._cp[this._cp[this._cp[idx].name_and_type_index].name_index].bytes;
     var obj = this._stack.pop();
     if (!obj) {
-        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+        this._throw(CLASSES.newException("java/lang/NullPointerException"));
     } else {
         this._stack.push(obj[fieldName]);
     }
@@ -1540,7 +1541,7 @@ Frame.prototype.getfield = function(done) {
 Frame.prototype.new = function(done) {
     var idx = this._read16();
     var className = this._cp[this._cp[idx].name_index].bytes;    
-    this._stack.push(CLASSES.createNewObject(className));
+    this._stack.push(CLASSES.newObject(className));
     return done();
 }
 
@@ -1826,7 +1827,7 @@ Frame.prototype.wide = function(done) {
 Frame.prototype.monitorenter = function(done) {
     var obj = this._stack.pop();
     if (!obj) {
-        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+        this._throw(CLASSES.newException("java/lang/NullPointerException"));
     } else if (obj.hasOwnProperty("$lock$")) {
         this._stack.push(obj);
         this._ip--;
@@ -1840,7 +1841,7 @@ Frame.prototype.monitorenter = function(done) {
 Frame.prototype.monitorexit = function(done) {
     var obj = this._stack.pop();
     if (!obj) {
-        this._throw(CLASSES.createException("java/lang/NullPointerException"));
+        this._throw(CLASSES.newException("java/lang/NullPointerException"));
     } else {
         delete obj["$lock$"];
         SCHEDULER.yield();
