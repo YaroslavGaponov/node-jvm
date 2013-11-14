@@ -28,12 +28,25 @@ var JVM = module.exports = function() {
         globalizer.add("OPCODES", OPCODES);
         
         THREADS.add(new Thread("main"));
+        
+        this.entryPoint = {
+            className: null,
+            methodName: "main"
+        };
     } else {
         return new JVM();
     }
 }
 
 util.inherits(JVM, EE);
+
+JVM.prototype.setEntryPointClassName = function(className) {
+    this.entryPoint.className = className;
+}
+
+JVM.prototype.setEntryPointMethodName = function(methodName) {
+    this.entryPoint.methodName = methodName;
+}
 
 JVM.prototype.setLogLevel = function(level) {
     LOG.setLogLevel(level);
@@ -64,12 +77,16 @@ JVM.prototype.loadJSFile = function(fileName) {
     return CLASSES.loadJSFile(fileName);
 }
 
+JVM.prototype.loadJarFile = function(fileName) {
+    return CLASSES.loadJarFile(fileName);
+}
+
 JVM.prototype.run = function() {
     var self = this;
     
     CLASSES.clinit();
     
-    var entryPoint = CLASSES.getEntryPoint();
+    var entryPoint = CLASSES.getEntryPoint(this.entryPoint.className, this.entryPoint.methodName);
     if (!entryPoint) {
         throw new Error("Entry point method is not found.");
     }

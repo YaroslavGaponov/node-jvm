@@ -42,7 +42,8 @@ public class Main {
 var JVM = require("node-jvm");
 var jvm = new JVM();
 jvm.setLogLevel(7);
-jvm.loadClassFiles(__dirname);
+var entryPointClassName = jvm.loadJarFile("./Main.jar");
+jvm.setEntryPointClassName(entryPointClassName);
 jvm.on("exit", function(code) {
     process.exit(code);
 });

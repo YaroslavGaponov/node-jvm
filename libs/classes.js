@@ -43,9 +43,7 @@ Classes.prototype.clinit = function() {
     }
 }
 
-Classes.prototype.loadClassFile = function(fileName) {
-    LOG.debug("loading " + fileName + " ...");
-    var bytes = fs.readFileSync(fileName);
+Classes.prototype.loadClassBytes = function(bytes) {
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;
     var classes = classArea.getClasses();
@@ -57,6 +55,12 @@ Classes.prototype.loadClassFile = function(fileName) {
     return classArea;
 }
 
+Classes.prototype.loadClassFile = function(fileName) {
+    LOG.debug("loading " + fileName + " ...");
+    var bytes = fs.readFileSync(fileName);
+    return this.loadClassBytes(bytes);
+}
+
 Classes.prototype.loadJSFile = function(fileName) {
     LOG.debug("loading " + fileName + " ...");
     var classArea = require(fileName);
@@ -64,8 +68,42 @@ Classes.prototype.loadJSFile = function(fileName) {
     return classArea;
 }
 
+Classes.prototype.loadJarFile = function(fileName) {
+    var self = this;
+    
+    var AdmZip = require("adm-zip");
+
+    var zip = new AdmZip(fileName);
+    var zipEntries = zip.getEntries();
+
+    var mainClass;
+    
+    zipEntries.forEach(function(zipEntry) {
+        if (!zipEntry.isDirectory) {
+            if (path.extname(zipEntry.entryName) === ".class") {
+                LOG.debug("loading " + fileName + '@' + zipEntry.entryName + " ...");
+                self.loadClassBytes(zipEntry.getData());
+            } else if (zipEntry.entryName === "META-INF/MANIFEST.MF") {
+                var manifest = zipEntry.getData().toString().split('\n');
+                for(var i=0; i<manifest.length; i++) {
+                    var line = [];
+                    manifest[i].split(':').forEach(
+                        function(p) {
+                            line.push(p.trim());
+                        }
+                    );
+                    if (line[0] === "Main-Class") {
+                        mainClass = line[1];
+                        break;
+                    }
+                }                
+            }
+        }
+        return mainClass;
+    });    
+}
+
 Classes.prototype.getEntryPoint = function(className, methodName) {
-    methodName = methodName || "main";
     for(var name in this.classes) {
         var ca = this.classes[name];
         if (ca instanceof ClassArea) {
