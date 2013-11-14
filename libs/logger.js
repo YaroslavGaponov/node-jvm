@@ -6,9 +6,10 @@
 var util = require("util");
 
 var LEVELS = {
-    DEBUG: 1<<0,
-    ERROR: 1<<1,
-    INFO: 1<<2,
+    DEBUG:  1<<0,
+    ERROR:  1<<1,
+    INFO:   1<<2,
+    WARM:   1<<3,
     check: function(levels, level) {
         return (levels & level) === level;
     }
@@ -16,7 +17,7 @@ var LEVELS = {
 
 var Logger = module.exports = function(levels) {
     if (this instanceof Logger) {
-        this.levels = levels || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.INFO );
+        this.levels = levels || ( LEVELS.DEBUG | LEVELS.ERROR | LEVELS.INFO | LEVELS.WARM );
     } else {
         return new Logger(levels);
     }
@@ -39,7 +40,13 @@ Logger.prototype.error = function(msg) {
 }
 
 Logger.prototype.info = function(msg) {
-    if (LEVELS.check(this.levels, LEVELS.PRINT)) {
+    if (LEVELS.check(this.levels, LEVELS.INFO)) {
         util.print("INFO: " + msg);
+    }
+}
+
+Logger.prototype.warn = function(msg) {
+    if (LEVELS.check(this.levels, LEVELS.WARM)) {
+        util.print("WARN: " + msg);
     }
 }
