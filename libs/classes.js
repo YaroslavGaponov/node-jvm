@@ -46,19 +46,20 @@ Classes.prototype.clinit = function() {
 Classes.prototype.loadClassBytes = function(bytes) {
     var classArea = new ClassArea(bytes);
     this.classes[classArea.getClassName()] = classArea;
-    var classes = classArea.getClasses();
-    for (var i=0; i<classes.length; i++) {
-        if (!this.classes[classes[i]]) {
-            this.loadClassFile(path.dirname(fileName) + path.sep + classes[i] + ".class");
-        }
-    }
     return classArea;
 }
 
 Classes.prototype.loadClassFile = function(fileName) {
     LOG.debug("loading " + fileName + " ...");
     var bytes = fs.readFileSync(fileName);
-    return this.loadClassBytes(bytes);
+    var ca = this.loadClassBytes(bytes);
+    var classes = ca.getClasses();
+    for (var i=0; i<classes.length; i++) {
+        if (!this.classes[classes[i]]) {
+            this.loadClassFile(path.dirname(fileName) + path.sep + classes[i] + ".class");
+        }
+    }
+    return ca;
 }
 
 Classes.prototype.loadJSFile = function(fileName) {
