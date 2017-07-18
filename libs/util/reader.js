@@ -31,7 +31,7 @@ Reader.prototype.read32 = function() {
 }
 
 Reader.prototype.readString = function(length) {
-    var data = this.bytes.toString(null, this.offset, this.offset + length)
+    var data = this.bytes.toString(undefined, this.offset, this.offset + length)
     this.offset += length;
     return data;
 }
