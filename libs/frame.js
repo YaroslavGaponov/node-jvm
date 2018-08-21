@@ -302,10 +302,6 @@ Frame.prototype.fload_0 = function(done) {
     return done();
 }
 
-Frame.prototype.fload_0 = function(done) {
-    this._stack.push(this._locals[0]);
-    return done();
-}
 
 Frame.prototype.dload_0 = function(done) {
     this._stack.push(this._locals[0]);
@@ -362,10 +358,6 @@ Frame.prototype.fload_2 = function(done) {
     return done();
 }
 
-Frame.prototype.fload_2 = function(done) {
-    this._stack.push(this._locals[2]);
-    return done();
-}
 
 Frame.prototype.dload_2 = function(done) {
     this._stack.push(this._locals[2]);
@@ -383,11 +375,6 @@ Frame.prototype.iload_3 = function(done) {
 }
 
 Frame.prototype.lload_3 = function(done) {
-    this._stack.push(this._locals[3]);
-    return done();
-}
-
-Frame.prototype.fload_3 = function(done) {
     this._stack.push(this._locals[3]);
     return done();
 }
