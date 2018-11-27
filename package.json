@@ -30,6 +30,9 @@
     "sinon-chai": "~2.4.0",
     "grunt-node-webkit-builder": "~0.1.11"
 },
+  "engines": {
+    "node": ">=0.3.0"
+  },  
   "author": "Yaroslav Gaponov",
   "license": "MIT",
   "readmeFilename": "readme.md",
