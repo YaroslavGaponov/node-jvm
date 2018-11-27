@@ -31,7 +31,7 @@
     "grunt-node-webkit-builder": "~0.1.11"
 },
   "engines": {
-    "node": ">=0.3.0"
+    "node": ">=8.11.0"
   },  
   "author": "Yaroslav Gaponov",
   "license": "MIT",
