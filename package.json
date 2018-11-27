@@ -20,7 +20,7 @@
     "machine"
   ],
   "dependencies": {
-    "adm-zip": "0.4.3"
+    "adm-zip": ">=0.4.11"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
