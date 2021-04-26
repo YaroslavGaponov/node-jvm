@@ -16,10 +16,10 @@ var LEVELS = {
 };
 
 var LOG = Object.freeze({
-    debug: console.debug || util.debug || console.log,
-    error: console.error || util.error || console.log,
-    info: console.info || util.print || console.log,
-    warn: console.warn || util.print || console.log
+    debug: console.debug || console.log,
+    error: console.error || console.log,
+    info: console.info || console.log,
+    warn: console.warn || console.log
 });
 
 var Logger = module.exports = function (levels) {

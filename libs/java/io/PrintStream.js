@@ -4,6 +4,7 @@
 */
 
 var util = require("util");
+var io = require("../../util/io");
 
 var out = module.exports = function() {
     if (this instanceof out) {        
@@ -17,14 +18,14 @@ out.getClassName = function() {
 }
  
 out.prototype["print"] = function() {
-    util.print.apply(null, arguments);
+    io.print.apply(null, arguments);
 };
 
 out.prototype["println"] = function() {
-    util.print.apply(null, arguments);
-    util.print("\n");
+    io.print.apply(null, arguments);
+    io.print("\n");
 };
 
 out.prototype["format"] = function(fmt, args) {
-    util.print(util.format.apply(null, [fmt].concat(args)));
+    io.print(util.format.apply(null, [fmt].concat(args)));
 }

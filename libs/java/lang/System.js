@@ -4,6 +4,7 @@
 */
 
 var util = require("util");
+var io = require("../../util/io");
 
 var System = module.exports = function() {
     if (this instanceof System) {
@@ -23,14 +24,14 @@ System["exit"] = function() {
 
 System["out"] = {
     "print": function() {
-        util.print.apply(null, arguments);
+        io.print.apply(null, arguments);
     },
     "println": function() {
-        util.print.apply(null, arguments);
-        util.print("\n");
+        io.print.apply(null, arguments);
+        io.print("\n");
     },
     "format": function(fmt, args) {
-        util.print(util.format.apply(null, [fmt].concat(args)));
+        io.print(util.format.apply(null, [fmt].concat(args)));
     }
 }
 
